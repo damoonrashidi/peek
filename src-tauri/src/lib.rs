@@ -85,14 +85,18 @@ async fn get_results(query: String) -> Result<String, String> {
         .await
         .map_err(|e| e.to_string())?;
 
+    // let start_time = chrono::Utc::now().timestamp_millis();
+
     let rows = sqlx::query(&query)
         .fetch_all(&mut conn)
         .await
         .map_err(|e| e.to_string())?;
 
+    // let execution_time_ms = chrono::Utc::now().timestamp_millis() - start_time;
+
     let mut results = Vec::new();
     for row in rows {
-        let mut map = HashMap::new();
+        let mut fields: Vec<(String, Value)> = Vec::new();
 
         for (i, col) in row.columns().iter().enumerate() {
             let col_name = col.name();
@@ -144,10 +148,10 @@ async fn get_results(query: String) -> Result<String, String> {
                 },
             };
 
-            map.insert(col_name.to_string(), value);
+            fields.push((col_name.to_string(), value));
         }
 
-        results.push(Value::Object(map.into_iter().collect()));
+        results.push(json!(fields));
     }
 
     serde_json::to_string(&results).map_err(|e| e.to_string())

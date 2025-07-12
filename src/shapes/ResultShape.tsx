@@ -66,9 +66,6 @@ export class ResultShapeUtil<
             columnDefs={columnDefs as any}
             rowStyle={rowStyle}
             getRowStyle={getRowStyle}
-            gridOptions={{
-              cellSelection: true,
-            }}
             autoSizeStrategy={{ type: "fitCellContents" }}
           />
         </div>

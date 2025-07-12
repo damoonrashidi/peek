@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Editor, Tldraw } from "tldraw";
 import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import "tldraw/tldraw.css";
+import "@mantine/core/styles.css";
 import "./App.css";
 import { customComponents, customUiOverrides } from "./TldrawUi";
 import { QueryShapeUtil } from "./shapes/QueryShape";
@@ -10,8 +11,17 @@ import { ResultShapeUtil } from "./shapes/ResultShape";
 import { invoke } from "@tauri-apps/api/core";
 import { schemaAtom } from "./state";
 import { useAtom } from "jotai";
+import { BarChartShapeUtil } from "./shapes/BarChartShape";
+import { createTheme, MantineProvider } from "@mantine/core";
+import { QueryErrorShapeUtil } from "./shapes/ErrorShape";
 
-const customShapes = [QueryShapeUtil, ResultShapeUtil];
+const customShapes = [
+  QueryShapeUtil,
+  ResultShapeUtil,
+  BarChartShapeUtil,
+  QueryErrorShapeUtil,
+];
+const theme = createTheme({});
 
 const fetchSchema = async () => {
   const response = (await invoke("get_schema")) as string;
@@ -31,17 +41,19 @@ function App() {
   }, []);
 
   return (
-    <div style={{ position: "fixed", inset: 0 }}>
-      <Tldraw
-        onMount={(editor) => {
-          ref.current = editor;
-        }}
-        shapeUtils={customShapes}
-        overrides={customUiOverrides}
-        components={customComponents}
-        tools={[QueryTool]}
-      />
-    </div>
+    <MantineProvider theme={theme}>
+      <div style={{ position: "fixed", inset: 0 }}>
+        <Tldraw
+          onMount={(editor) => {
+            ref.current = editor;
+          }}
+          shapeUtils={customShapes}
+          overrides={customUiOverrides}
+          components={customComponents}
+          tools={[QueryTool]}
+        />
+      </div>
+    </MantineProvider>
   );
 }
 

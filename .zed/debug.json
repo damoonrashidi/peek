@@ -1,0 +1,11 @@
+[
+  {
+    "adapter": "CodeLLDB",
+    "label": "peek (CodeLLDB)",
+    "request": "launch",
+    "name": "peek (CodeLLDB)",
+    "program": "./src-tauri/target/debug/peek",
+    "stopOnEntry": false,
+    "cwd": "/Users/damoonrashidi/labs/peek"
+  }
+]
