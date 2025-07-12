@@ -1,5 +1,4 @@
-import { AgGridReact } from "ag-grid-react";
-import { useMemo, useCallback } from "react";
+import { Table } from "@mantine/core";
 
 import {
   Geometry2d,
@@ -8,47 +7,43 @@ import {
   resizeBox,
   ShapeUtil,
   TLBaseShape,
-  useDelaySvgExport,
 } from "tldraw";
+import { DataCell } from "../ResultTable/Cell";
+import "./ResultShape.css";
 
-type ResultShape<T> = TLBaseShape<
+type ResultShape = TLBaseShape<
   "result",
-  { data: T[]; w: number; h: number }
+  { data: [[string, unknown]][]; w: number; h: number }
 >;
 
-export class ResultShapeUtil<
-  T extends Record<string, unknown>,
-> extends ShapeUtil<ResultShape<T>> {
+export class ResultShapeUtil extends ShapeUtil<ResultShape> {
   static override type = "result" as const;
 
   override canResize = () => true;
   override canEdit = () => true;
   override canScroll = () => true;
 
-  component(shape: ResultShape<T>) {
+  component(shape: ResultShape) {
     const isEditing = this.editor.getEditingShapeId() === shape.id;
-    const isReady = useDelaySvgExport();
 
     if (shape.props.data.length === 0) {
-      return <HTMLContainer>No results</HTMLContainer>;
+      return (
+        <HTMLContainer>
+          <div
+            className="no-results"
+            style={{ width: shape.props.w, height: shape.props.h }}
+          >
+            No results
+          </div>
+        </HTMLContainer>
+      );
     }
 
-    const columnDefs = Object.keys(shape.props.data[0]).map(
-      (field: keyof T) => ({
-        headerName: field.toString(),
-        field: field.toString().toLowerCase(),
-      }),
-    );
+    const headers = shape.props.data[0].map(([key]) => key);
 
-    const rowStyle = useMemo(() => {
-      return { background: "#faf4ed", fontFamily: "Monaspace Krypton" };
-    }, []);
-
-    const getRowStyle = useCallback((params: any) => {
-      if (params.node.rowIndex % 2 === 0) {
-        return { background: "#fffaf3" };
-      }
-    }, []);
+    const copyToClipboard = (value: unknown) => {
+      navigator.clipboard.writeText((value as string).toString());
+    };
 
     return (
       <HTMLContainer id={shape.id}>
@@ -57,23 +52,45 @@ export class ResultShapeUtil<
             width: shape.props.w,
             height: shape.props.h,
             pointerEvents: isEditing ? "all" : undefined,
+            overflow: "auto",
           }}
           className="ag-theme-quartz"
         >
-          <AgGridReact
-            onGridReady={isReady}
-            rowData={shape.props.data}
-            columnDefs={columnDefs as any}
-            rowStyle={rowStyle}
-            getRowStyle={getRowStyle}
-            autoSizeStrategy={{ type: "fitCellContents" }}
-          />
+          <Table
+            stickyHeader
+            striped
+            highlightOnHover
+            withTableBorder
+            withColumnBorders
+          >
+            <Table.Thead>
+              <Table.Tr>
+                {headers.map((header, i) => (
+                  <Table.Th key={i}>{header}</Table.Th>
+                ))}
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {shape.props.data.map((row, i) => (
+                <Table.Tr key={i}>
+                  {row.map(([, value], o) => (
+                    <Table.Td
+                      key={o}
+                      onDoubleClick={() => copyToClipboard(value)}
+                    >
+                      <DataCell value={value} />
+                    </Table.Td>
+                  ))}
+                </Table.Tr>
+              ))}
+            </Table.Tbody>
+          </Table>
         </div>
       </HTMLContainer>
     );
   }
 
-  getDefaultProps(): { data: T[]; w: number; h: number } {
+  getDefaultProps(): { data: [[string, unknown]][]; w: number; h: number } {
     return {
       data: [],
       w: 300,
@@ -81,7 +98,7 @@ export class ResultShapeUtil<
     };
   }
 
-  getGeometry(shape: ResultShape<T>): Geometry2d {
+  getGeometry(shape: ResultShape): Geometry2d {
     return new Rectangle2d({
       width: shape.props.w,
       height: shape.props.h,
@@ -89,11 +106,11 @@ export class ResultShapeUtil<
     });
   }
 
-  indicator(shape: ResultShape<T>) {
+  indicator(shape: ResultShape) {
     return <rect width={shape.props.w} height={shape.props.h} />;
   }
 
-  override onResize(shape: ResultShape<T>, info: any) {
+  override onResize(shape: ResultShape, info: any) {
     return resizeBox(shape, info);
   }
 }

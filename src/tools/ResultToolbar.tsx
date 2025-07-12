@@ -27,11 +27,8 @@ export const ResultContextualToolbarComponent = () => {
       return;
     }
 
-    const data = (
-      shape.props as ReturnType<
-        ResultShapeUtil<Record<string, unknown>>["getDefaultProps"]
-      >
-    ).data;
+    const data = (shape.props as ReturnType<ResultShapeUtil["getDefaultProps"]>)
+      .data;
 
     if (data.length === 0) {
       return;
@@ -40,12 +37,11 @@ export const ResultContextualToolbarComponent = () => {
     const fields = [];
 
     for (const row of data) {
-      const columns = Object.entries(row);
       let has_label = false;
 
       const chart_data: Record<string, string | number> = {};
 
-      for (const [key, value] of columns) {
+      for (const [key, value] of row) {
         if (typeof value === "number") {
           chart_data[key] = value;
         } else if (typeof value === "string" && !has_label) {

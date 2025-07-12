@@ -65,11 +65,9 @@ export const QueryContextualToolbarComponent = track(() => {
     try {
       const response = (await invoke("get_results", { query })) as string;
 
-      const json = JSON.parse(response) as [string, unknown][][];
+      const result = JSON.parse(response) as [string, unknown][][];
 
-      const result = json.map((row) => Object.fromEntries(row));
-
-      const columnCount = Object.keys(result[0]).length;
+      const columnCount = result[0]?.length ?? 0;
       const resultShapeId = createShapeId(shape.id + "-result");
 
       editor.createShape({
@@ -79,8 +77,8 @@ export const QueryContextualToolbarComponent = track(() => {
         y: shape.y,
         props: {
           data: result,
-          w: columnCount * 250,
-          h: Math.min(result.length * 45, 1200),
+          w: Math.max(columnCount * 250, 200),
+          h: Math.max(Math.min(result.length * 45, 1200), 200),
         },
       });
 
