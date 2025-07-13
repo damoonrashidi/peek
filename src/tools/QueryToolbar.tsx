@@ -60,8 +60,6 @@ export const QueryContextualToolbarComponent = track(() => {
 
     const ast = new Parser().astify(query);
 
-    console.log(ast);
-
     try {
       const response = (await invoke("get_results", { query })) as string;
 
@@ -77,6 +75,7 @@ export const QueryContextualToolbarComponent = track(() => {
         y: shape.y,
         props: {
           data: result,
+          ast,
           w: Math.max(columnCount * 250, 200),
           h: Math.max(Math.min(result.length * 45, 1200), 200),
         },

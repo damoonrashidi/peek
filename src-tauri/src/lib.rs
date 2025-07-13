@@ -135,6 +135,11 @@ async fn get_results(query: String) -> Result<String, String> {
 
                 "JSON" | "JSONB" => row.try_get::<Value, _>(i).unwrap_or(Value::Null),
 
+                "BOOL" => row
+                    .try_get::<bool, _>(i)
+                    .map(|v| json!(v))
+                    .unwrap_or(Value::Null),
+
                 _ => match row
                     .try_get_raw(i)
                     .map(|raw| raw.as_bytes())
