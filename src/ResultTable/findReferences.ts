@@ -44,15 +44,14 @@ export function getInboundReferences(
     .filter((from) => "table" in from)
     .map((from) => from.table);
 
-  tables.forEach((table) => {
-    const something = Object.entries(schema).filter(([t, references]) =>
-      references.includes(`${t}.${column}`),
-    );
+  const currentTableColumn = tables.map((table) => `${table}.${column}`);
 
-    if (something.length > 0) {
-      console.log(something, table);
-    }
+  return Object.entries(schema).flatMap(([key, refs]) => {
+    return refs
+      .filter((ref) => currentTableColumn.includes(ref))
+      .map(() => {
+        const [from_table, from_col] = key.split(".");
+        return { table: from_table, column: from_col };
+      });
   });
-
-  return [];
 }

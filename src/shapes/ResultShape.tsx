@@ -63,6 +63,8 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
       outbound[column] = getOutboundReferences(ast, schema.references, column);
     });
 
+    console.log({ inbound, outbound });
+
     const copyToClipboard = (value: unknown) => {
       navigator.clipboard.writeText((value as string).toString());
     };
@@ -87,22 +89,80 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
           >
             <Table.Thead>
               <Table.Tr>
-                {headers.map((header, i) => (
-                  <Table.Th key={i}>{header}</Table.Th>
-                ))}
+                {headers.map((header, i) => {
+                  const hasInbound = inbound[header]?.length > 0;
+                  const hasOutbound = outbound[header]?.length > 0;
+
+                  let headerStyle = {};
+                  if (hasInbound && hasOutbound) {
+                    headerStyle = {
+                      background:
+                        "linear-gradient(45deg, #fff3cd 50%, #cce5ff 50%)",
+                      fontWeight: "bold",
+                    };
+                  } else if (hasInbound) {
+                    headerStyle = {
+                      backgroundColor: "#fff3cd",
+                      fontWeight: "bold",
+                    };
+                  } else if (hasOutbound) {
+                    headerStyle = {
+                      backgroundColor: "#cce5ff",
+                      fontWeight: "bold",
+                    };
+                  }
+
+                  return (
+                    <Table.Th key={i} style={headerStyle}>
+                      {header}
+                      {hasInbound && hasOutbound && " ↕"}
+                      {hasInbound && !hasOutbound && " ↓"}
+                      {hasOutbound && !hasInbound && " ↑"}
+                    </Table.Th>
+                  );
+                })}
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
               {shape.props.data.map((row, i) => (
                 <Table.Tr key={i}>
-                  {row.map(([column, value], o) => (
-                    <Table.Td
-                      key={o}
-                      onDoubleClick={() => copyToClipboard(value)}
-                    >
-                      <DataCell value={value} outbound={outbound[column]} />
-                    </Table.Td>
-                  ))}
+                  {row.map(([column, value], o) => {
+                    const hasInbound = inbound[column]?.length > 0;
+                    const hasOutbound = outbound[column]?.length > 0;
+
+                    let cellStyle = {};
+                    if (hasInbound && hasOutbound) {
+                      cellStyle = {
+                        background:
+                          "linear-gradient(45deg, #fff3cd 50%, #cce5ff 50%)",
+                        cursor: "pointer",
+                      };
+                    } else if (hasInbound) {
+                      cellStyle = {
+                        backgroundColor: "#fff3cd",
+                        cursor: "pointer",
+                      };
+                    } else if (hasOutbound) {
+                      cellStyle = {
+                        backgroundColor: "#cce5ff",
+                        cursor: "pointer",
+                      };
+                    }
+
+                    return (
+                      <Table.Td
+                        key={o}
+                        onDoubleClick={() => copyToClipboard(value)}
+                        style={cellStyle}
+                      >
+                        <DataCell
+                          value={value}
+                          outbound={outbound[column]}
+                          inbound={inbound[column]}
+                        />
+                      </Table.Td>
+                    );
+                  })}
                 </Table.Tr>
               ))}
             </Table.Tbody>
