@@ -8,6 +8,7 @@ import {
   useTools,
 } from "tldraw";
 import { CustomContextualToolbarComponent } from "./tools/CustomToolbar";
+import { ConnectionPanel } from "./Connection/ConnectionPanel";
 
 export const customUiOverrides: TLUiOverrides = {
   tools(editor, tools) {
@@ -53,6 +54,7 @@ export const customComponents: TLComponents = {
       </DefaultToolbar>
     );
   },
+  SharePanel: ConnectionPanel,
   ActionsMenu: null,
   HelpMenu: null,
   StylePanel: null,

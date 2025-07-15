@@ -9,8 +9,8 @@ import { QueryShapeUtil } from "./shapes/QueryShape";
 import { QueryTool } from "./tools/QueryTool";
 import { ResultShapeUtil } from "./shapes/ResultShape";
 import { invoke } from "@tauri-apps/api/core";
-import { schemaAtom } from "./state";
-import { useAtom } from "jotai";
+import { persistanceAtom, schemaAtom } from "./state";
+import { useAtom, useAtomValue } from "jotai";
 import { BarChartShapeUtil } from "./shapes/BarChartShape";
 import { createTheme, MantineProvider } from "@mantine/core";
 import { QueryErrorShapeUtil } from "./shapes/ErrorShape";
@@ -31,6 +31,7 @@ const fetchSchema = async () => {
 function App() {
   const ref = useRef<Editor>();
   const [, setSchema] = useAtom(schemaAtom);
+  const persistanceKey = useAtomValue(persistanceAtom);
 
   ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -47,6 +48,7 @@ function App() {
           onMount={(editor) => {
             ref.current = editor;
           }}
+          persistenceKey={persistanceKey}
           shapeUtils={customShapes}
           overrides={customUiOverrides}
           components={customComponents}

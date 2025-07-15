@@ -1,14 +1,20 @@
-use std::collections::HashMap;
-
 use serde_json::{json, Value};
 use sqlx::{Column, Connection, PgConnection, Row, TypeInfo};
+use std::collections::HashMap;
+use tauri::{async_runtime::Mutex, State};
+
+#[derive(Debug, Default)]
+struct AppData {
+    connection_string: String,
+}
 
 #[tauri::command]
-async fn get_schema() -> Result<String, String> {
-    let mut conn =
-        PgConnection::connect("postgres://metered_user:metered_password@localhost/forge")
-            .await
-            .map_err(|e| e.to_string())?;
+async fn get_schema(state: State<'_, Mutex<AppData>>) -> Result<String, String> {
+    let state = state.lock().await;
+
+    let mut conn = PgConnection::connect(&state.connection_string)
+        .await
+        .map_err(|e| e.to_string())?;
 
     let columns = sqlx::query(
         "SELECT table_name, column_name FROM information_schema.columns WHERE table_schema = 'public'",
@@ -81,11 +87,12 @@ async fn get_schema() -> Result<String, String> {
 }
 
 #[tauri::command]
-async fn get_results(query: String) -> Result<String, String> {
-    let mut conn =
-        PgConnection::connect("postgres://metered_user:metered_password@localhost/forge")
-            .await
-            .map_err(|e| e.to_string())?;
+async fn get_results(state: State<'_, Mutex<AppData>>, query: String) -> Result<String, String> {
+    let state = state.lock().await;
+
+    let mut conn = PgConnection::connect(&state.connection_string)
+        .await
+        .map_err(|e| e.to_string())?;
 
     // let start_time = chrono::Utc::now().timestamp_millis();
 
@@ -179,12 +186,29 @@ async fn get_results(query: String) -> Result<String, String> {
     serde_json::to_string(&results).map_err(|e| e.to_string())
 }
 
+#[tauri::command]
+async fn set_connection(
+    state: State<'_, Mutex<AppData>>,
+    connection_string: String,
+) -> Result<(), String> {
+    let mut state = state.lock().await;
+
+    state.connection_string = connection_string;
+
+    Ok(())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .manage(Mutex::new(AppData::default()))
         .plugin(tauri_plugin_sql::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![get_results, get_schema])
+        .invoke_handler(tauri::generate_handler![
+            get_results,
+            get_schema,
+            set_connection
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

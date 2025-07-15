@@ -1,4 +1,5 @@
 import { atom } from "jotai";
+import { atomWithStorage } from "jotai/utils";
 
 export const schemaAtom = atom<{
   tables: Record<string, string[]>;
@@ -9,3 +10,8 @@ export const schemaAtom = atom<{
 });
 
 export const providerRegistrationAtom = atom(false);
+
+export const persistanceAtom = atomWithStorage<string>(
+  "persistance",
+  "default",
+);
