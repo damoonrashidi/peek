@@ -16,6 +16,7 @@ import { createSqlProvider } from "../Editor/languageProvider";
 import { useAtomValue } from "jotai";
 import { providerRegistrationAtom, schemaAtom } from "../state";
 import { useAtom } from "jotai";
+import { format } from "sql-formatter";
 
 type QueryShape = TLBaseShape<"query", { query: string; w: number; h: number }>;
 
@@ -53,6 +54,18 @@ export class QueryShapeUtil extends ShapeUtil<QueryShape> {
           onMount={(editor, monaco) => {
             this.editorRef!.current = editor;
             this.monacoRef!.current = monaco;
+
+            editor.addCommand(
+              monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyI,
+              () => {
+                editor.setValue(
+                  format(editor.getValue(), {
+                    keywordCase: "upper",
+                    functionCase: "upper",
+                  }),
+                );
+              },
+            );
 
             if (!hasRegisteredProvider) {
               const provider = createSqlProvider(schema);

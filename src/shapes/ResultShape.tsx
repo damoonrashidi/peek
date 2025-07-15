@@ -63,8 +63,6 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
       outbound[column] = getOutboundReferences(ast, schema.references, column);
     });
 
-    console.log({ inbound, outbound });
-
     const copyToClipboard = (value: unknown) => {
       navigator.clipboard.writeText((value as string).toString());
     };
@@ -77,6 +75,7 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
             height: shape.props.h,
             pointerEvents: isEditing ? "all" : undefined,
             overflow: "auto",
+            borderRadius: 8,
           }}
           className="ag-theme-quartz"
         >

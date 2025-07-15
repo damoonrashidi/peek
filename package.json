@@ -17,7 +17,6 @@
     "@tauri-apps/api": "^2.6.0",
     "@tauri-apps/plugin-opener": "^2",
     "@tauri-apps/plugin-sql": "~2",
-    "ag-grid-react": "^34.0.1",
     "jotai": "^2.12.5",
     "monaco-editor": "^0.52.2",
     "node-sql-parser": "^5.3.10",

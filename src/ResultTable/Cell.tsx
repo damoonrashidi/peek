@@ -111,31 +111,17 @@ export const DataCell = ({
     }
   };
 
-  try {
-    const deserialised = JSON.parse(value as string);
-    return <pre>{JSON.stringify(deserialised, null, 2)}</pre>;
-  } catch {}
-
-  if (typeof value === "string") {
-    try {
-      const url = new URL(value);
-      return (
-        <a href={url.href} target="_blank" rel="noopener noreferrer">
-          {url.toString()}
-        </a>
-      );
-    } catch {
-      if (inbound.length > 0) {
-        return <div onClick={openInboundReferences}>{value}</div>;
-      }
-      if (outbound.length > 0) {
-        return <div onClick={openOutboundReferences}>{value}</div>;
-      }
-      return value;
-    }
+  if (typeof value === "object" && value !== null) {
+    return <pre>{JSON.stringify(value, null, 2)}</pre>;
   }
 
-  if (typeof value === "number") {
+  if (typeof value === "string" || typeof value === "number") {
+    if (inbound.length > 0) {
+      return <div onClick={openInboundReferences}>{value}</div>;
+    }
+    if (outbound.length > 0) {
+      return <div onClick={openOutboundReferences}>{value}</div>;
+    }
     return value;
   }
 

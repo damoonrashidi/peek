@@ -55,23 +55,23 @@ export const createSqlProvider = ({
             range,
           });
         });
-      }
+      } else {
+        const generalColumnKeywordsRegex =
+          /(SELECT|WHERE|GROUP BY|ORDER BY|SET|\.)\s+([\w\s,]*)$/i;
+        const generalColumnMatch = textUntilPosition.match(
+          generalColumnKeywordsRegex,
+        );
 
-      const generalColumnKeywordsRegex =
-        /(SELECT|WHERE|GROUP BY|ORDER BY|SET|\.)\s+([\w\s,]*)$/i;
-      const generalColumnMatch = textUntilPosition.match(
-        generalColumnKeywordsRegex,
-      );
-
-      if (generalColumnMatch) {
-        Array.from(columns).forEach((columnName) => {
-          suggestions.push({
-            label: columnName,
-            kind: languages.CompletionItemKind.Field,
-            insertText: columnName,
-            range,
+        if (generalColumnMatch) {
+          Array.from(columns).forEach((columnName) => {
+            suggestions.push({
+              label: columnName,
+              kind: languages.CompletionItemKind.Field,
+              insertText: columnName,
+              range,
+            });
           });
-        });
+        }
       }
 
       const sqlKeywords = [
@@ -97,6 +97,8 @@ export const createSqlProvider = ({
         "COUNT",
         "SUM",
         "AVG",
+        "LIKE",
+        "ILIKE",
         "MIN",
         "MAX",
         "LEFT JOIN",

@@ -5,9 +5,10 @@ use sqlx::{Column, Connection, PgConnection, Row, TypeInfo};
 
 #[tauri::command]
 async fn get_schema() -> Result<String, String> {
-    let mut conn = PgConnection::connect("postgres://dbuser:dbpassword@localhost/nesso")
-        .await
-        .map_err(|e| e.to_string())?;
+    let mut conn =
+        PgConnection::connect("postgres://metered_user:metered_password@localhost/forge")
+            .await
+            .map_err(|e| e.to_string())?;
 
     let columns = sqlx::query(
         "SELECT table_name, column_name FROM information_schema.columns WHERE table_schema = 'public'",
@@ -81,9 +82,10 @@ async fn get_schema() -> Result<String, String> {
 
 #[tauri::command]
 async fn get_results(query: String) -> Result<String, String> {
-    let mut conn = PgConnection::connect("postgres://dbuser:dbpassword@localhost/nesso")
-        .await
-        .map_err(|e| e.to_string())?;
+    let mut conn =
+        PgConnection::connect("postgres://metered_user:metered_password@localhost/forge")
+            .await
+            .map_err(|e| e.to_string())?;
 
     // let start_time = chrono::Utc::now().timestamp_millis();
 
@@ -113,6 +115,11 @@ async fn get_results(query: String) -> Result<String, String> {
                     .map(|v| json!(v))
                     .unwrap_or(Value::Null),
 
+                "DATE" => row
+                    .try_get::<chrono::NaiveDate, _>(i)
+                    .map(|v| json!(v.format("%Y-%m-%d").to_string()))
+                    .unwrap_or(Value::Null),
+
                 "TIMESTAMP" => row
                     .try_get::<chrono::NaiveDateTime, _>(i)
                     .map(|dt| json!(dt.format("%Y-%m-%dT%H:%M:%S").to_string()))
@@ -123,13 +130,23 @@ async fn get_results(query: String) -> Result<String, String> {
                     .map(|dt| json!(dt.to_rfc3339()))
                     .unwrap_or(Value::Null),
 
-                "INT4" | "INT8" => row
+                "INT2" => row
+                    .try_get::<i16, _>(i)
+                    .map(|v| json!(v))
+                    .unwrap_or(Value::Null),
+
+                "INT4" => row
+                    .try_get::<i32, _>(i)
+                    .map(|v| json!(v))
+                    .unwrap_or(Value::Null),
+
+                "INT8" => row
                     .try_get::<i64, _>(i)
                     .map(|v| json!(v))
                     .unwrap_or(Value::Null),
 
-                "FLOAT4" | "FLOAT8" => row
-                    .try_get::<f64, _>(i)
+                "FLOAT4" | "FLOAT8" | "NUMERIC" => row
+                    .try_get::<rust_decimal::Decimal, _>(i)
                     .map(|v| json!(v))
                     .unwrap_or(Value::Null),
 

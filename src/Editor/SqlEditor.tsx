@@ -11,11 +11,7 @@ export const SqlEditor = ({
   onMount?: (editor: editor.IStandaloneCodeEditor, monaco: Monaco) => void;
 }) => {
   return (
-    <div
-      style={{
-        height: "100%",
-      }}
-    >
+    <div style={{ height: "100%" }}>
       <Editor
         height="100%"
         defaultLanguage="sql"

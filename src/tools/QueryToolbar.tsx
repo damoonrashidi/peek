@@ -9,7 +9,6 @@ import {
 import { createArrowBetweenShapes } from "./createArrowBetweenShapes";
 import { QueryShapeUtil } from "../shapes/QueryShape";
 import { invoke } from "@tauri-apps/api/core";
-import { format } from "sql-formatter";
 import { Parser } from "node-sql-parser";
 
 export const QueryContextualToolbarComponent = track(() => {
@@ -21,30 +20,6 @@ export const QueryContextualToolbarComponent = track(() => {
       return undefined;
     }
     return new Box(fullBounds.x, fullBounds.y, fullBounds.width, 0);
-  };
-
-  const formatQuery = () => {
-    const shape = editor
-      .getSelectedShapes()
-      .find((shape) => shape.type === "query");
-    if (!shape) {
-      return;
-    }
-
-    const query = (shape.props as ReturnType<QueryShapeUtil["getDefaultProps"]>)
-      .query;
-
-    const formatted = format(query, {
-      keywordCase: "upper",
-    });
-
-    editor.updateShape({
-      id: shape.id,
-      type: "query",
-      props: {
-        query: formatted,
-      },
-    });
   };
 
   const executeQuery = async () => {
@@ -114,9 +89,6 @@ export const QueryContextualToolbarComponent = track(() => {
         onClick={executeQuery}
       >
         Execute
-      </TldrawUiButton>
-      <TldrawUiButton title="Execute query" type="normal" onClick={formatQuery}>
-        Format
       </TldrawUiButton>
     </TldrawUiContextualToolbar>
   );
