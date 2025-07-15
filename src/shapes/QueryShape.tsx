@@ -8,7 +8,6 @@ import {
   stopEventPropagation,
 } from "tldraw";
 import "./Query.css";
-import { MutableRefObject, useRef } from "react";
 import { SqlEditor } from "../Editor/SqlEditor";
 import { editor } from "monaco-editor";
 import { Monaco } from "@monaco-editor/react";
@@ -23,9 +22,8 @@ type QueryShape = TLBaseShape<"query", { query: string; w: number; h: number }>;
 export class QueryShapeUtil extends ShapeUtil<QueryShape> {
   static override type = "query" as const;
 
-  editorRef: MutableRefObject<editor.IStandaloneCodeEditor | null> | null =
-    null;
-  monacoRef: MutableRefObject<Monaco | null> | null = null;
+  private editorInstances = new Map<string, editor.IStandaloneCodeEditor>();
+  private monacoInstances = new Map<string, Monaco>();
 
   override canEdit = () => true;
   override canResize = () => true;
@@ -41,8 +39,6 @@ export class QueryShapeUtil extends ShapeUtil<QueryShape> {
     );
 
     const isEditing = this.editor.getEditingShapeId() === shape.id;
-    this.editorRef = useRef(null);
-    this.monacoRef = useRef(null);
 
     return (
       <HTMLContainer
@@ -52,18 +48,27 @@ export class QueryShapeUtil extends ShapeUtil<QueryShape> {
         <SqlEditor
           query={shape.props.query}
           onMount={(editor, monaco) => {
-            this.editorRef!.current = editor;
-            this.monacoRef!.current = monaco;
+            this.editorInstances.set(shape.id, editor);
+            this.monacoInstances.set(shape.id, monaco);
 
             editor.addCommand(
               monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyI,
               () => {
-                editor.setValue(
-                  format(editor.getValue(), {
-                    keywordCase: "upper",
-                    functionCase: "upper",
-                  }),
-                );
+                const editingShapeId = this.editor.getEditingShapeId();
+                if (!editingShapeId) {
+                  return;
+                }
+                const editorInstance = this.editorInstances.get(editingShapeId);
+                if (!editorInstance) {
+                  return;
+                }
+
+                const formatted = format(editorInstance.getValue(), {
+                  keywordCase: "upper",
+                  functionCase: "upper",
+                });
+
+                editorInstance?.setValue(formatted);
               },
             );
 
@@ -86,11 +91,19 @@ export class QueryShapeUtil extends ShapeUtil<QueryShape> {
   }
 
   override onEditStart(): void {
-    this.editorRef?.current?.focus();
+    const editingShapeId = this.editor.getEditingShapeId();
+    if (editingShapeId) {
+      const editorInstance = this.editorInstances.get(editingShapeId);
+      editorInstance?.focus();
+    }
   }
 
-  override onDoubleClick() {
-    this.editorRef?.current?.focus();
+  override onDoubleClick(): void {
+    const editingShapeId = this.editor.getEditingShapeId();
+    if (editingShapeId) {
+      const editorInstance = this.editorInstances.get(editingShapeId);
+      editorInstance?.focus();
+    }
   }
 
   getGeometry(shape: QueryShape): Geometry2d {
@@ -101,11 +114,11 @@ export class QueryShapeUtil extends ShapeUtil<QueryShape> {
     });
   }
 
-  override onResize(shape: QueryShape, info: any) {
-    return resizeBox(shape, info);
-  }
-
   indicator(shape: QueryShape) {
     return <rect width={shape.props.w} height={shape.props.h} />;
+  }
+
+  override onResize(shape: QueryShape, info: any) {
+    return resizeBox(shape, info);
   }
 }
