@@ -33,6 +33,17 @@ export const customUiOverrides: TLUiOverrides = {
         editor.setCurrentTool("query");
       },
     };
+
+    actions["reset-zoom"] = {
+      id: "reset-zoom",
+      label: "Reset Zoom",
+      readonlyOk: true,
+      kbd: "0",
+      onSelect() {
+        editor.resetZoom();
+        console.log("resetting zoom");
+      },
+    };
     return actions;
   },
 };
