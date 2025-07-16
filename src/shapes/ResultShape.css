@@ -14,19 +14,19 @@
 }
 
 .cell {
-    background: var(--rp-surface);
+    background: var(--cell-base);
 }
 
 .inbound {
-    background: var(--rp-overlay);
+    background: var(--inbound-key);
     cursor: pointer;
 }
 
 .outbound {
-    background: var(--rp-highlight-med);
+    background: var(--outbound-key);
     cursor: pointer;
 }
 
 .even:not(.inbound, .outbound) {
-    background: var(--rp-base);
+    background: var(--cell-striped);
 }

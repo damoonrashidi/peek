@@ -65,7 +65,7 @@ export class QueryShapeUtil extends ShapeUtil<QueryShape> {
                   return;
                 }
 
-                executeQuery(editorInstance.getValue());
+                executeQuery([editorInstance.getValue()]);
               },
             );
 

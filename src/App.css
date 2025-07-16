@@ -3,19 +3,9 @@ body {
 }
 
 :root {
-    --rp-base: rgb(250, 244, 237);
-    --rp-surface: rgb(255, 250, 243);
-    --rp-overlay: rgb(242, 233, 222);
-    --rp-muted: rgb(152, 147, 165);
-    --rp-subtle: rgb(121, 117, 147);
-    --rp-text: rgb(87, 82, 121);
-    --rp-love: rgb(180, 99, 122);
-    --rp-gold: rgb(234, 157, 52);
-    --rp-rose: rgb(215, 130, 126);
-    --rp-pine: rgb(40, 105, 131);
-    --rp-foam: rgb(86, 148, 159);
-    --rp-iris: rgb(144, 122, 169);
-    --rp-highlight-low: rgb(244, 237, 232);
-    --rp-highlight-med: rgb(223, 218, 217);
-    --rp-highlight-high: rgb(206, 202, 205);
+    --inbound-key: hsl(210deg, 80%, 90%);
+    --outbound-key: hsl(20deg, 80%, 90%);
+    --border-base: hsl(0deg, 0%, 70%);
+    --cell-base: hsl(0deg, 0%, 98%);
+    --cell-striped: hsl(0deg, 0%, 95%);
 }

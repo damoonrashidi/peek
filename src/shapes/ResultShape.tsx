@@ -75,7 +75,6 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
             height: shape.props.h,
             pointerEvents: isEditing ? "all" : undefined,
             overflow: "auto",
-            borderRadius: 8,
           }}
           className="ag-theme-quartz"
         >
@@ -86,7 +85,7 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
               highlightOnHover
               withTableBorder
               withColumnBorders
-              borderColor="var(--rp-highlight-med)"
+              borderColor="var(--border-base)"
             >
               <Table.Thead>
                 <Table.Tr>

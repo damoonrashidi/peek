@@ -29,7 +29,7 @@ export const QueryContextualToolbarComponent = track(() => {
     const query = (shape.props as ReturnType<QueryShapeUtil["getDefaultProps"]>)
       .query;
 
-    executeQuery(query);
+    executeQuery([query]);
   };
 
   return (
