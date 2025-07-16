@@ -1,8 +1,6 @@
 import { Text } from "@mantine/core";
 import { CellReference } from "./findReferences";
-import { invoke } from "@tauri-apps/api/core";
-import { createShapeId, useEditor } from "tldraw";
-import { createArrowBetweenShapes } from "../tools/createArrowBetweenShapes";
+import { useEditor } from "tldraw";
 import { useExecuteQuery } from "../tools/useExecuteQuery";
 
 export const DataCell = ({

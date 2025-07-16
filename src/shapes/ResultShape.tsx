@@ -53,14 +53,14 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
 
     const headers = shape.props.data[0].map(([key]) => key);
 
-    const inbound: Record<string, { table: string; column: string }[]> = {};
-    headers.forEach((column) => {
-      inbound[column] = getInboundReferences(ast, schema.references, column);
-    });
-
     const outbound: Record<string, { table: string; column: string }[]> = {};
     headers.forEach((column) => {
-      outbound[column] = getOutboundReferences(ast, schema.references, column);
+      outbound[column] = getInboundReferences(ast, schema.references, column);
+    });
+
+    const inbound: Record<string, { table: string; column: string }[]> = {};
+    headers.forEach((column) => {
+      inbound[column] = getOutboundReferences(ast, schema.references, column);
     });
 
     const copyToClipboard = (value: unknown) => {

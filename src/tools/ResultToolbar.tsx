@@ -1,5 +1,3 @@
-import { IconChartBar } from "@tabler/icons-react";
-
 import {
   Box,
   TldrawUiButton,
@@ -62,7 +60,6 @@ export const ResultContextualToolbarComponent = () => {
           onClick={runCreateChart}
           disabled={!canChart}
         >
-          <IconChartBar size={20} />
           Chart
         </TldrawUiButton>
       </Group>

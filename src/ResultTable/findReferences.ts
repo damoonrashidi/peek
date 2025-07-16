@@ -2,7 +2,7 @@ import { AST } from "node-sql-parser";
 
 export type CellReference = { table: string; column: string };
 
-export function getOutboundReferences(
+export function getInboundReferences(
   ast: AST,
   schema: Record<string, string[]>,
   column: string,
@@ -27,7 +27,7 @@ export function getOutboundReferences(
   });
 }
 
-export function getInboundReferences(
+export function getOutboundReferences(
   ast: AST,
   schema: Record<string, string[]>,
   column: string,
