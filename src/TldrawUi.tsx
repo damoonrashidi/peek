@@ -40,8 +40,8 @@ export const customUiOverrides: TLUiOverrides = {
       readonlyOk: true,
       kbd: "0",
       onSelect() {
+        editor.zoomToSelection();
         editor.resetZoom();
-        console.log("resetting zoom");
       },
     };
     return actions;
