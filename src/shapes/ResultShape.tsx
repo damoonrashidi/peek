@@ -1,5 +1,4 @@
 import { Stack, Table } from "@mantine/core";
-import { AST, Parser } from "node-sql-parser";
 
 import {
   Geometry2d,
@@ -17,10 +16,11 @@ import {
   getInboundReferences,
   getOutboundReferences,
 } from "../ResultTable/findReferences";
+import { Parser } from "node-sql-parser";
 
 type ResultShape = TLBaseShape<
   "result",
-  { data: [[string, unknown]][]; w: number; h: number; ast: AST | AST[] }
+  { data: [[string, unknown]][]; w: number; h: number; query: string }
 >;
 
 export class ResultShapeUtil extends ShapeUtil<ResultShape> {
@@ -34,9 +34,9 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
     const isEditing = this.editor.getEditingShapeId() === shape.id;
     const schema = useAtomValue(schemaAtom);
 
-    const ast = Array.isArray(shape.props.ast)
-      ? shape.props.ast[0]
-      : shape.props.ast;
+    const astOptions = new Parser().astify(shape.props.query);
+    console.log(astOptions);
+    const ast = Array.isArray(astOptions) ? astOptions[0] : astOptions;
 
     if (shape.props.data.length === 0) {
       return (
@@ -86,34 +86,23 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
               highlightOnHover
               withTableBorder
               withColumnBorders
+              borderColor="var(--rp-highlight-med)"
             >
               <Table.Thead>
                 <Table.Tr>
                   {headers.map((header, i) => {
                     const hasInbound = inbound[header]?.length > 0;
                     const hasOutbound = outbound[header]?.length > 0;
+                    const headerClasses = ["header"];
 
-                    let headerStyle = {};
-                    if (hasInbound && hasOutbound) {
-                      headerStyle = {
-                        background:
-                          "linear-gradient(45deg, #fff3cd 50%, #cce5ff 50%)",
-                        fontWeight: "bold",
-                      };
-                    } else if (hasInbound) {
-                      headerStyle = {
-                        backgroundColor: "#fff3cd",
-                        fontWeight: "bold",
-                      };
+                    if (hasInbound) {
+                      headerClasses.push("inbound");
                     } else if (hasOutbound) {
-                      headerStyle = {
-                        backgroundColor: "#cce5ff",
-                        fontWeight: "bold",
-                      };
+                      headerClasses.push("outbound");
                     }
 
                     return (
-                      <Table.Th key={i} style={headerStyle}>
+                      <Table.Th key={i} className={headerClasses.join(" ")}>
                         {header}
                         {hasInbound && hasOutbound && " ↕"}
                         {hasInbound && !hasOutbound && " ↑"}
@@ -130,35 +119,23 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
                       const hasInbound = inbound[column]?.length > 0;
                       const hasOutbound = outbound[column]?.length > 0;
 
-                      let cellStyle: {
-                        background: string;
-                        cursor?: "pointer";
-                      } = {
-                        background: i % 2 === 0 ? "#faf4ed" : "#fffaf3",
-                      };
-                      if (hasInbound && hasOutbound) {
-                        cellStyle = {
-                          background:
-                            "linear-gradient(45deg, #fff3cd 50%, #cce5ff 50%)",
-                          cursor: "pointer",
-                        };
-                      } else if (hasInbound) {
-                        cellStyle = {
-                          background: "#fff3cd",
-                          cursor: "pointer",
-                        };
+                      const cellClasses = ["cell"];
+
+                      if (hasInbound) {
+                        cellClasses.push("inbound");
                       } else if (hasOutbound) {
-                        cellStyle = {
-                          background: "#cce5ff",
-                          cursor: "pointer",
-                        };
+                        cellClasses.push("outbound");
+                      }
+
+                      if (i % 2 === 0) {
+                        cellClasses.push("even");
                       }
 
                       return (
                         <Table.Td
                           key={o}
                           onDoubleClick={() => copyToClipboard(value)}
-                          style={cellStyle}
+                          className={cellClasses.join(" ")}
                         >
                           <DataCell
                             value={value}
@@ -182,13 +159,13 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
     data: [[string, unknown]][];
     w: number;
     h: number;
-    ast: AST | AST[];
+    query: string;
   } {
     return {
       data: [],
       w: 300,
       h: 500,
-      ast: new Parser().parse("").ast,
+      query: "",
     };
   }
 

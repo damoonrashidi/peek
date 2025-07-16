@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import { Editor, Tldraw } from "tldraw";
-import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import "tldraw/tldraw.css";
 import "@mantine/core/styles.css";
 import "./App.css";
@@ -14,14 +13,12 @@ import { useAtom, useAtomValue } from "jotai";
 import { BarChartShapeUtil } from "./shapes/BarChartShape";
 import { createTheme, MantineProvider } from "@mantine/core";
 import { QueryErrorShapeUtil } from "./shapes/ErrorShape";
-import { ResultToolbarShapeUtil } from "./shapes/ResultToolbarShape";
 
 const customShapes = [
   QueryShapeUtil,
   ResultShapeUtil,
   BarChartShapeUtil,
   QueryErrorShapeUtil,
-  ResultToolbarShapeUtil,
 ];
 const theme = createTheme({});
 
@@ -34,8 +31,6 @@ function App() {
   const ref = useRef<Editor>();
   const [, setSchema] = useAtom(schemaAtom);
   const persistanceKey = useAtomValue(persistanceAtom);
-
-  ModuleRegistry.registerModules([AllCommunityModule]);
 
   useEffect(() => {
     fetchSchema().then((schema) => {

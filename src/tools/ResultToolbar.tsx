@@ -1,15 +1,30 @@
+import { IconChartBar } from "@tabler/icons-react";
+
 import {
   Box,
-  createShapeId,
   TldrawUiButton,
   TldrawUiContextualToolbar,
   useEditor,
 } from "tldraw";
 import { ResultShapeUtil } from "../shapes/ResultShape";
-import { createArrowBetweenShapes } from "./createArrowBetweenShapes";
+import { Divider, Group, Text } from "@mantine/core";
+import { Parser } from "node-sql-parser";
+import { useCreateChart } from "./useCreateChart";
 
 export const ResultContextualToolbarComponent = () => {
   const editor = useEditor();
+  const shape = editor.getOnlySelectedShape()!;
+  const createChart = useCreateChart(shape);
+
+  const props = shape.props as ReturnType<ResultShapeUtil["getDefaultProps"]>;
+
+  const canChart =
+    props.data.length > 0 &&
+    props.data[0].find(([, value]) => typeof value === "number");
+
+  const tables = new Parser()
+    .tableList(props.query)
+    .map((table) => table.split("::").pop());
 
   const getSelectionBounds = () => {
     const fullBounds = editor.getSelectionRotatedScreenBounds();
@@ -19,60 +34,8 @@ export const ResultContextualToolbarComponent = () => {
     return new Box(fullBounds.x, fullBounds.y, fullBounds.width, 0);
   };
 
-  const createChart = () => {
-    const shape = editor
-      .getSelectedShapes()
-      .find((shape) => shape.type === "result");
-    if (!shape) {
-      return;
-    }
-
-    const data = (shape.props as ReturnType<ResultShapeUtil["getDefaultProps"]>)
-      .data;
-
-    if (data.length === 0) {
-      return;
-    }
-
-    const fields = [];
-
-    for (const row of data) {
-      let has_label = false;
-
-      const chart_data: Record<string, string | number> = {};
-
-      for (const [key, value] of row) {
-        if (typeof value === "number") {
-          chart_data[key] = value;
-        } else if (typeof value === "string" && !has_label) {
-          chart_data[key] = value;
-          has_label = true;
-        }
-      }
-
-      fields.push(chart_data);
-    }
-
-    const chartShapeId = createShapeId(shape.id + "-chart");
-
-    const bounds = getSelectionBounds();
-
-    editor.createShape({
-      type: "barchart",
-      id: chartShapeId,
-      x: shape.x + (bounds?.w ?? 0) + 50,
-      y: shape.y,
-      props: {
-        data: fields,
-        w: 500,
-        h: 500,
-      },
-    });
-
-    editor.select(chartShapeId);
-    editor.zoomToSelection({ animation: { duration: 300 } });
-
-    createArrowBetweenShapes(editor, shape.id, chartShapeId);
+  const runCreateChart = () => {
+    createChart();
   };
 
   return (
@@ -80,9 +43,29 @@ export const ResultContextualToolbarComponent = () => {
       getSelectionBounds={getSelectionBounds}
       label="Actions"
     >
-      <TldrawUiButton title="Graph" type="normal" onClick={createChart}>
-        Chart
-      </TldrawUiButton>
+      <Group>
+        <Group pl="lg" py={0} h="100%">
+          {tables.map((table) => (
+            <Text key={table} size="xs">
+              {table}
+            </Text>
+          ))}
+        </Group>
+        <Divider variant="solid" orientation="vertical" />
+        <Group py={0} h="100%">
+          <Text size="xs">{props.data.length} Rows</Text>
+        </Group>
+        <Divider variant="solid" orientation="vertical" />
+        <TldrawUiButton
+          title="Graph"
+          type="normal"
+          onClick={runCreateChart}
+          disabled={!canChart}
+        >
+          <IconChartBar size={20} />
+          Chart
+        </TldrawUiButton>
+      </Group>
     </TldrawUiContextualToolbar>
   );
 };

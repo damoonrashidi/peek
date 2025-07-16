@@ -1,7 +1,6 @@
 import { createShapeId, TLShape, useEditor } from "tldraw";
 import { createArrowBetweenShapes } from "./createArrowBetweenShapes";
 import { invoke } from "@tauri-apps/api/core";
-import { Parser } from "node-sql-parser";
 
 export const useExecuteQuery = (shape: TLShape) => {
   const editor = useEditor();
@@ -18,9 +17,7 @@ export const useExecuteQuery = (shape: TLShape) => {
       }
 
       const columnCount = result[0]?.length ?? 0;
-      const ast = new Parser().astify(query);
-      const resultShapeId = createShapeId(query + "-result");
-      const toolbarShapeId = createShapeId(query + "-result-toolbar");
+      const resultShapeId = createShapeId(shape.id + "-result");
 
       editor.createShape({
         id: resultShapeId,
@@ -29,22 +26,9 @@ export const useExecuteQuery = (shape: TLShape) => {
         y: shape.y,
         props: {
           data: result,
-          ast,
+          query,
           w: Math.max(columnCount * 250, 200),
           h: Math.max(Math.min(result.length * 45, 1200), 200),
-        },
-      });
-
-      editor.createShape({
-        id: toolbarShapeId,
-        type: "result-toolbar",
-        x: x + 50,
-        y: shape.y - 50,
-        props: {
-          query,
-          count: result.length,
-          w: Math.max(columnCount * 250, 200),
-          h: 50,
         },
       });
 

@@ -1181,6 +1181,18 @@
   resolved "https://registry.yarnpkg.com/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.44.2.tgz#660018c9696ad4f48abe8c5d56db53c81aadba25"
   integrity sha512-3+QZROYfJ25PDcxFF66UEk8jGWigHJeecZILvkPkyQN7oc5BvFo4YEXFkOs154j3FTMp9mn9Ky8RCOwastduEA==
 
+"@tabler/icons-react@^3.34.0":
+  version "3.34.0"
+  resolved "https://registry.yarnpkg.com/@tabler/icons-react/-/icons-react-3.34.0.tgz#8503c25ba9e50ff02a49a1f9c62ceecfd27fa3ab"
+  integrity sha512-OpEIR2iZsIXECtAIMbn1zfKfQ3zKJjXyIZlkgOGUL9UkMCFycEiF2Y8AVfEQsyre/3FnBdlWJvGr0NU47n2TbQ==
+  dependencies:
+    "@tabler/icons" "3.34.0"
+
+"@tabler/icons@3.34.0":
+  version "3.34.0"
+  resolved "https://registry.yarnpkg.com/@tabler/icons/-/icons-3.34.0.tgz#b11734dc76686abe969b68c2f33e565b116b70fb"
+  integrity sha512-jtVqv0JC1WU2TTEBN32D9+R6mc1iEBuPwLnBsWaR02SIEciu9aq5806AWkCHuObhQ4ERhhXErLEK7Fs+tEZxiA==
+
 "@tauri-apps/api@^2.6.0":
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/@tauri-apps/api/-/api-2.6.0.tgz#efd873bf04b0d72cea81f9397e16218f5deafe0f"
@@ -1696,26 +1708,6 @@
     "@rolldown/pluginutils" "1.0.0-beta.19"
     "@types/babel__core" "^7.20.5"
     react-refresh "^0.17.0"
-
-ag-charts-types@12.0.1:
-  version "12.0.1"
-  resolved "https://registry.yarnpkg.com/ag-charts-types/-/ag-charts-types-12.0.1.tgz#7f48fcbcc05cf1cad8522f2852276a9ef72ad438"
-  integrity sha512-AvAmoyuKG63UxrwGTU+T6f+EEE8tc4ksm7Ai9lJcaUHn9s4PU9hspAGl69GnZpAiIxzA5uCLDvG/Did5N2DB2A==
-
-ag-grid-community@34.0.1:
-  version "34.0.1"
-  resolved "https://registry.yarnpkg.com/ag-grid-community/-/ag-grid-community-34.0.1.tgz#d179d5c2a57d563d0b8f6d0f246d4b90e4cde52e"
-  integrity sha512-EzSWOGS/zMm9cqLrJUM6T5e2fPA10c4j0ADMS7QLy6NvzeSeT+iUwoaVHz+QfIDVv69is9KwHs6EYCT87FT5eg==
-  dependencies:
-    ag-charts-types "12.0.1"
-
-ag-grid-react@^34.0.1:
-  version "34.0.1"
-  resolved "https://registry.yarnpkg.com/ag-grid-react/-/ag-grid-react-34.0.1.tgz#36344ecf01c3f5d10ca4b5902e79a3ec712246b4"
-  integrity sha512-oFaSuPcTcFyn8iwV5mC5NIU/XI5r1taIGRSkZxSfpjXH755m0PKc7enSoboJgztUI0kMqE0DFY2hJb45I4QAlw==
-  dependencies:
-    ag-grid-community "34.0.1"
-    prop-types "^15.8.1"
 
 argparse@^2.0.1:
   version "2.0.1"
