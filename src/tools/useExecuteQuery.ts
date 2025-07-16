@@ -51,12 +51,12 @@ export const useExecuteQuery = (shape: TLShape) => {
       editor.select(resultShapeId);
       editor.zoomToSelection({ animation: { duration: 300 } });
 
-      const group = [
-        editor.getShape(resultShapeId),
-        editor.getShape(toolbarShapeId),
-      ] as TLShape[];
+      // const group = [
+      //   editor.getShape(resultShapeId),
+      //   editor.getShape(toolbarShapeId),
+      // ] as TLShape[];
 
-      editor.groupShapes(group);
+      // editor.groupShapes(group);
 
       createArrowBetweenShapes(editor, shape.id, resultShapeId);
     } catch (e) {

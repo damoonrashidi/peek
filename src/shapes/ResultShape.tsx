@@ -116,8 +116,8 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
                       <Table.Th key={i} style={headerStyle}>
                         {header}
                         {hasInbound && hasOutbound && " ↕"}
-                        {hasInbound && !hasOutbound && " ↓"}
-                        {hasOutbound && !hasInbound && " ↑"}
+                        {hasInbound && !hasOutbound && " ↑"}
+                        {hasOutbound && !hasInbound && " ↓"}
                       </Table.Th>
                     );
                   })}
@@ -130,7 +130,12 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
                       const hasInbound = inbound[column]?.length > 0;
                       const hasOutbound = outbound[column]?.length > 0;
 
-                      let cellStyle = {};
+                      let cellStyle: {
+                        background: string;
+                        cursor?: "pointer";
+                      } = {
+                        background: i % 2 === 0 ? "#faf4ed" : "#fffaf3",
+                      };
                       if (hasInbound && hasOutbound) {
                         cellStyle = {
                           background:
@@ -139,12 +144,12 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
                         };
                       } else if (hasInbound) {
                         cellStyle = {
-                          backgroundColor: "#fff3cd",
+                          background: "#fff3cd",
                           cursor: "pointer",
                         };
                       } else if (hasOutbound) {
                         cellStyle = {
-                          backgroundColor: "#cce5ff",
+                          background: "#cce5ff",
                           cursor: "pointer",
                         };
                       }
