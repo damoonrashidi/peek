@@ -45,7 +45,6 @@ export class BarChartShapeUtil extends ShapeUtil<BarChartShape> {
             height: shape.props.h,
             pointerEvents: isEditing ? "all" : undefined,
           }}
-          className="ag-theme-quartz"
         >
           <BarChart
             h="100%"

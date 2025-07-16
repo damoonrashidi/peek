@@ -17,6 +17,8 @@ import {
   getOutboundReferences,
 } from "../ResultTable/findReferences";
 import { Parser } from "node-sql-parser";
+import { useVirtualizedTable } from "../tools/useVirtualizedTable";
+import { useRef } from "react";
 
 type ResultShape = TLBaseShape<
   "result",
@@ -34,8 +36,25 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
     const isEditing = this.editor.getEditingShapeId() === shape.id;
     const schema = useAtomValue(schemaAtom);
 
+    const headers = shape.props.data[0].map(([key]) => key);
+    const totalRows = shape.props.data.length;
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const { visibleStartIndex, visibleEndIndex, rowHeight } =
+      useVirtualizedTable({
+        totalRows,
+        scrollContainerRef,
+        data: shape.props.data, // Pass data for row height measurement
+      });
+
+    const visibleRows = shape.props.data.slice(
+      visibleStartIndex,
+      visibleEndIndex,
+    );
+    const totalContentHeight = totalRows * rowHeight;
+    const paddingTop = visibleStartIndex * rowHeight;
+    const paddingBottom = (totalRows - visibleEndIndex) * rowHeight;
+
     const astOptions = new Parser().astify(shape.props.query);
-    console.log(astOptions);
     const ast = Array.isArray(astOptions) ? astOptions[0] : astOptions;
 
     if (shape.props.data.length === 0) {
@@ -43,15 +62,16 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
         <HTMLContainer>
           <div
             className="no-results"
-            style={{ width: shape.props.w, height: shape.props.h }}
+            style={{
+              width: shape.props.w,
+              height: shape.props.h,
+            }}
           >
             No results
           </div>
         </HTMLContainer>
       );
     }
-
-    const headers = shape.props.data[0].map(([key]) => key);
 
     const outbound: Record<string, { table: string; column: string }[]> = {};
     headers.forEach((column) => {
@@ -63,10 +83,6 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
       inbound[column] = getOutboundReferences(ast, schema.references, column);
     });
 
-    const copyToClipboard = (value: unknown) => {
-      navigator.clipboard.writeText((value as string).toString());
-    };
-
     return (
       <HTMLContainer id={shape.id}>
         <div
@@ -75,10 +91,14 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
             height: shape.props.h,
             pointerEvents: isEditing ? "all" : undefined,
             overflow: "auto",
+            position: "relative",
           }}
-          className="ag-theme-quartz"
+          ref={scrollContainerRef}
         >
-          <Stack gap="md">
+          <Stack
+            gap="md"
+            style={{ height: totalContentHeight, position: "relative" }}
+          >
             <Table
               stickyHeader
               striped
@@ -86,6 +106,11 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
               withTableBorder
               withColumnBorders
               borderColor="var(--border-base)"
+              style={{
+                position: "absolute",
+                top: paddingTop,
+                width: "100%",
+              }}
             >
               <Table.Thead>
                 <Table.Tr>
@@ -112,42 +137,42 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
-                {shape.props.data.map((row, i) => (
-                  <Table.Tr key={i}>
-                    {row.map(([column, value], o) => {
-                      const hasInbound = inbound[column]?.length > 0;
-                      const hasOutbound = outbound[column]?.length > 0;
+                {visibleRows.map((row, i) => {
+                  const originalIndex = visibleStartIndex + i;
+                  return (
+                    <Table.Tr key={originalIndex}>
+                      {row.map(([column, value], o) => {
+                        const hasInbound = inbound[column]?.length > 0;
+                        const hasOutbound = outbound[column]?.length > 0;
 
-                      const cellClasses = ["cell"];
+                        const cellClasses = ["cell"];
 
-                      if (hasInbound) {
-                        cellClasses.push("inbound");
-                      } else if (hasOutbound) {
-                        cellClasses.push("outbound");
-                      }
+                        if (hasInbound) {
+                          cellClasses.push("inbound");
+                        } else if (hasOutbound) {
+                          cellClasses.push("outbound");
+                        }
 
-                      if (i % 2 === 0) {
-                        cellClasses.push("even");
-                      }
+                        if (i % 2 === 0) {
+                          cellClasses.push("even");
+                        }
 
-                      return (
-                        <Table.Td
-                          key={o}
-                          onDoubleClick={() => copyToClipboard(value)}
-                          className={cellClasses.join(" ")}
-                        >
-                          <DataCell
-                            value={value}
-                            outbound={outbound[column]}
-                            inbound={inbound[column]}
-                          />
-                        </Table.Td>
-                      );
-                    })}
-                  </Table.Tr>
-                ))}
+                        return (
+                          <Table.Td key={o} className={cellClasses.join(" ")}>
+                            <DataCell
+                              value={value}
+                              outbound={outbound[column]}
+                              inbound={inbound[column]}
+                            />
+                          </Table.Td>
+                        );
+                      })}
+                    </Table.Tr>
+                  );
+                })}
               </Table.Tbody>
             </Table>
+            <div style={{ height: paddingBottom }}></div>
           </Stack>
         </div>
       </HTMLContainer>
