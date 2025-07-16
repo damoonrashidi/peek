@@ -14,12 +14,14 @@ import { useAtom, useAtomValue } from "jotai";
 import { BarChartShapeUtil } from "./shapes/BarChartShape";
 import { createTheme, MantineProvider } from "@mantine/core";
 import { QueryErrorShapeUtil } from "./shapes/ErrorShape";
+import { ResultToolbarShapeUtil } from "./shapes/ResultToolbarShape";
 
 const customShapes = [
   QueryShapeUtil,
   ResultShapeUtil,
   BarChartShapeUtil,
   QueryErrorShapeUtil,
+  ResultToolbarShapeUtil,
 ];
 const theme = createTheme({});
 

@@ -4,6 +4,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { createShapeId, useEditor } from "tldraw";
 import { createArrowBetweenShapes } from "../tools/createArrowBetweenShapes";
 import { Parser } from "node-sql-parser";
+import { useExecuteQuery } from "../tools/useExecuteQuery";
 
 export const DataCell = ({
   value,
@@ -15,7 +16,8 @@ export const DataCell = ({
   outbound: CellReference[];
 }) => {
   const editor = useEditor();
-  const shape = editor.getOnlySelectedShape();
+  const shape = editor.getOnlySelectedShape()!;
+  const executeQuery = useExecuteQuery(shape);
 
   const openOutboundReferences = async () => {
     const queries = outbound.map(
@@ -26,41 +28,8 @@ export const DataCell = ({
       return;
     }
 
-    const x = editor.getSelectionPageBounds()?.right ?? shape.x + 500;
-
-    let i = 0;
     for (const query of queries) {
-      const response = (await invoke("get_results", { query })) as string;
-      const result = JSON.parse(response) as [string, unknown][][];
-
-      if (result.length === 0) {
-        continue;
-      }
-
-      const ast = new Parser().astify(query);
-
-      const columnCount = result[0]?.length ?? 0;
-      const resultShapeId = createShapeId(query + "-result");
-
-      editor.createShape({
-        id: resultShapeId,
-        type: "result",
-        x: x + 50,
-        y: shape.y + i * 500,
-        props: {
-          data: result,
-          ast,
-          w: Math.max(columnCount * 250, 200),
-          h: Math.max(Math.min(result.length * 45, 1200), 200),
-        },
-      });
-
-      editor.select(resultShapeId);
-      editor.zoomToSelection({ animation: { duration: 300 } });
-
-      createArrowBetweenShapes(editor, shape.id, resultShapeId);
-
-      i += 1;
+      executeQuery(query);
     }
   };
 

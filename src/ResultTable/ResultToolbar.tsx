@@ -1,14 +1,13 @@
 import { Badge, Group } from "@mantine/core";
-import { AST, Parser } from "node-sql-parser";
+import { Parser } from "node-sql-parser";
 import "./ResultToolbar.css";
 
 interface ResultToolarProps {
-  ast: AST;
+  query: string;
   count: number;
 }
-export const ResultToolar = ({ ast, count }: ResultToolarProps) => {
+export const ResultToolbar = ({ query, count }: ResultToolarProps) => {
   const parser = new Parser();
-  const query = parser.sqlify(ast);
   const tables = parser
     .tableList(query)
     .map((table) => table.split("::").pop());

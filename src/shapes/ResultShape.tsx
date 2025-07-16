@@ -17,7 +17,6 @@ import {
   getInboundReferences,
   getOutboundReferences,
 } from "../ResultTable/findReferences";
-import { ResultToolar } from "../ResultTable/ResultToolbar";
 
 type ResultShape = TLBaseShape<
   "result",
@@ -80,7 +79,6 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
           }}
           className="ag-theme-quartz"
         >
-          <ResultToolar ast={ast} count={shape.props.data.length} />
           <Stack gap="md">
             <Table
               stickyHeader

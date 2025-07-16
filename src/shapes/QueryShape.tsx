@@ -16,6 +16,7 @@ import { useAtomValue } from "jotai";
 import { providerRegistrationAtom, schemaAtom } from "../state";
 import { useAtom } from "jotai";
 import { format } from "sql-formatter";
+import { useExecuteQuery } from "../tools/useExecuteQuery";
 
 type QueryShape = TLBaseShape<"query", { query: string; w: number; h: number }>;
 
@@ -34,6 +35,7 @@ export class QueryShapeUtil extends ShapeUtil<QueryShape> {
 
   component(shape: QueryShape) {
     const schema = useAtomValue(schemaAtom);
+    const executeQuery = useExecuteQuery(shape);
     const [hasRegisteredProvider, setHasRegisteredProvider] = useAtom(
       providerRegistrationAtom,
     );
@@ -50,6 +52,22 @@ export class QueryShapeUtil extends ShapeUtil<QueryShape> {
           onMount={(editor, monaco) => {
             this.editorInstances.set(shape.id, editor);
             this.monacoInstances.set(shape.id, monaco);
+
+            editor.addCommand(
+              monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
+              () => {
+                const editingShapeId = this.editor.getEditingShapeId();
+                if (!editingShapeId) {
+                  return;
+                }
+                const editorInstance = this.editorInstances.get(editingShapeId);
+                if (!editorInstance) {
+                  return;
+                }
+
+                executeQuery(editorInstance.getValue());
+              },
+            );
 
             editor.addCommand(
               monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyI,
