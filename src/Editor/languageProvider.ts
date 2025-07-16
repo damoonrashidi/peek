@@ -2,11 +2,14 @@ import { languages } from "monaco-editor";
 
 export const createSqlProvider = ({
   tables,
+  references,
 }: {
   tables: Record<string, string[]>;
   references: Record<string, string[]>;
-}) => {
+}): languages.CompletionItemProvider => {
   const tableNames = Object.keys(tables);
+  const allReferences = Object.values(references).flat();
+  const inboundReferences = Object.keys(references);
   const columns = Array.from(
     new Set(
       Object.entries(tables)
@@ -16,11 +19,22 @@ export const createSqlProvider = ({
   );
 
   return {
-    // Define characters that should trigger completion suggestions
-    triggerCharacters: [" ", ".", "\n", ","],
+    triggerCharacters: [" ", ".", ","],
+    provideCompletionItems(model, position) {
+      const value = model.getValue();
+      const at = model.getWordAtPosition(position)?.word ?? "";
+      const before =
+        (() => {
+          const textBeforeCursor = value.substring(
+            0,
+            model.getOffsetAt(position),
+          );
+          const words = textBeforeCursor.trim().split(/\s+/);
+          return words.length >= 1 ? words[words.length - 1] : null;
+        })() ?? "";
 
-    provideCompletionItems: (model: any, position: any) => {
       const word = model.getWordUntilPosition(position);
+
       const range = {
         startLineNumber: position.lineNumber,
         endLineNumber: position.lineNumber,
@@ -28,96 +42,27 @@ export const createSqlProvider = ({
         endColumn: word.endColumn,
       };
 
-      const textUntilPosition = model.getValueInRange({
-        startLineNumber: 1,
-        startColumn: 1,
-        endLineNumber: position.lineNumber,
-        endColumn: position.column,
-      });
-
-      const suggestions: {
-        label: string;
-        kind: languages.CompletionItemKind;
-        insertText: string;
-        range: typeof range;
-      }[] = [];
-
-      const tableKeywordsRegex =
-        /(FROM|JOIN|INTO|UPDATE|DELETE\s+FROM)\s+([\w\s]*)$/i;
-      const tableMatch = textUntilPosition.match(tableKeywordsRegex);
-
-      if (tableMatch) {
-        tableNames.forEach((tableName) => {
-          suggestions.push({
-            label: tableName,
-            kind: languages.CompletionItemKind.Folder, // Icon for folders often used for tables
-            insertText: tableName,
+      if (["FROM", "JOIN"].includes(before.toUpperCase()) && at === "") {
+        return {
+          suggestions: tableNames.map((table) => ({
+            label: table,
+            kind: languages.CompletionItemKind.Folder,
+            insertText: table,
             range,
-          });
-        });
-      } else {
-        const generalColumnKeywordsRegex =
-          /(SELECT|WHERE|GROUP BY|ORDER BY|SET|\.)\s+([\w\s,]*)$/i;
-        const generalColumnMatch = textUntilPosition.match(
-          generalColumnKeywordsRegex,
-        );
-
-        if (generalColumnMatch) {
-          Array.from(columns).forEach((columnName) => {
-            suggestions.push({
-              label: columnName,
-              kind: languages.CompletionItemKind.Field,
-              insertText: columnName,
-              range,
-            });
-          });
-        }
+          })),
+        };
       }
 
-      const sqlKeywords = [
-        "SELECT",
-        "FROM",
-        "WHERE",
-        "JOIN",
-        "INSERT INTO",
-        "VALUES",
-        "UPDATE",
-        "SET",
-        "DELETE FROM",
-        "AND",
-        "OR",
-        "NOT",
-        "GROUP BY",
-        "ORDER BY",
-        "LIMIT",
-        "OFFSET",
-        "AS",
-        "ON",
-        "DISTINCT",
-        "COUNT",
-        "SUM",
-        "AVG",
-        "LIKE",
-        "ILIKE",
-        "MIN",
-        "MAX",
-        "LEFT JOIN",
-        "RIGHT JOIN",
-        "INNER JOIN",
-        "OUTER JOIN",
-        "ASC",
-        "DESC",
-      ];
-
-      sqlKeywords.forEach((keyword) => {
-        suggestions.push({
-          label: keyword,
-          kind: languages.CompletionItemKind.Keyword,
-          insertText: keyword + (keyword.includes(" ") ? "" : " "),
-          range: range,
-        });
-      });
-      // }
+      const suggestions = [
+        ...allReferences,
+        ...inboundReferences,
+        ...columns,
+      ].map((column) => ({
+        label: column,
+        kind: languages.CompletionItemKind.Field,
+        insertText: column,
+        range,
+      }));
 
       return { suggestions };
     },

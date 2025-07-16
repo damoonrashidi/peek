@@ -1,4 +1,4 @@
-import { Table } from "@mantine/core";
+import { Stack, Table } from "@mantine/core";
 import { AST, Parser } from "node-sql-parser";
 
 import {
@@ -17,6 +17,7 @@ import {
   getInboundReferences,
   getOutboundReferences,
 } from "../ResultTable/findReferences";
+import { ResultToolar } from "../ResultTable/ResultToolbar";
 
 type ResultShape = TLBaseShape<
   "result",
@@ -79,93 +80,96 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
           }}
           className="ag-theme-quartz"
         >
-          <Table
-            stickyHeader
-            striped
-            highlightOnHover
-            withTableBorder
-            withColumnBorders
-          >
-            <Table.Thead>
-              <Table.Tr>
-                {headers.map((header, i) => {
-                  const hasInbound = inbound[header]?.length > 0;
-                  const hasOutbound = outbound[header]?.length > 0;
+          <ResultToolar ast={ast} count={shape.props.data.length} />
+          <Stack gap="md">
+            <Table
+              stickyHeader
+              striped
+              highlightOnHover
+              withTableBorder
+              withColumnBorders
+            >
+              <Table.Thead>
+                <Table.Tr>
+                  {headers.map((header, i) => {
+                    const hasInbound = inbound[header]?.length > 0;
+                    const hasOutbound = outbound[header]?.length > 0;
 
-                  let headerStyle = {};
-                  if (hasInbound && hasOutbound) {
-                    headerStyle = {
-                      background:
-                        "linear-gradient(45deg, #fff3cd 50%, #cce5ff 50%)",
-                      fontWeight: "bold",
-                    };
-                  } else if (hasInbound) {
-                    headerStyle = {
-                      backgroundColor: "#fff3cd",
-                      fontWeight: "bold",
-                    };
-                  } else if (hasOutbound) {
-                    headerStyle = {
-                      backgroundColor: "#cce5ff",
-                      fontWeight: "bold",
-                    };
-                  }
-
-                  return (
-                    <Table.Th key={i} style={headerStyle}>
-                      {header}
-                      {hasInbound && hasOutbound && " ↕"}
-                      {hasInbound && !hasOutbound && " ↓"}
-                      {hasOutbound && !hasInbound && " ↑"}
-                    </Table.Th>
-                  );
-                })}
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {shape.props.data.map((row, i) => (
-                <Table.Tr key={i}>
-                  {row.map(([column, value], o) => {
-                    const hasInbound = inbound[column]?.length > 0;
-                    const hasOutbound = outbound[column]?.length > 0;
-
-                    let cellStyle = {};
+                    let headerStyle = {};
                     if (hasInbound && hasOutbound) {
-                      cellStyle = {
+                      headerStyle = {
                         background:
                           "linear-gradient(45deg, #fff3cd 50%, #cce5ff 50%)",
-                        cursor: "pointer",
+                        fontWeight: "bold",
                       };
                     } else if (hasInbound) {
-                      cellStyle = {
+                      headerStyle = {
                         backgroundColor: "#fff3cd",
-                        cursor: "pointer",
+                        fontWeight: "bold",
                       };
                     } else if (hasOutbound) {
-                      cellStyle = {
+                      headerStyle = {
                         backgroundColor: "#cce5ff",
-                        cursor: "pointer",
+                        fontWeight: "bold",
                       };
                     }
 
                     return (
-                      <Table.Td
-                        key={o}
-                        onDoubleClick={() => copyToClipboard(value)}
-                        style={cellStyle}
-                      >
-                        <DataCell
-                          value={value}
-                          outbound={outbound[column]}
-                          inbound={inbound[column]}
-                        />
-                      </Table.Td>
+                      <Table.Th key={i} style={headerStyle}>
+                        {header}
+                        {hasInbound && hasOutbound && " ↕"}
+                        {hasInbound && !hasOutbound && " ↓"}
+                        {hasOutbound && !hasInbound && " ↑"}
+                      </Table.Th>
                     );
                   })}
                 </Table.Tr>
-              ))}
-            </Table.Tbody>
-          </Table>
+              </Table.Thead>
+              <Table.Tbody>
+                {shape.props.data.map((row, i) => (
+                  <Table.Tr key={i}>
+                    {row.map(([column, value], o) => {
+                      const hasInbound = inbound[column]?.length > 0;
+                      const hasOutbound = outbound[column]?.length > 0;
+
+                      let cellStyle = {};
+                      if (hasInbound && hasOutbound) {
+                        cellStyle = {
+                          background:
+                            "linear-gradient(45deg, #fff3cd 50%, #cce5ff 50%)",
+                          cursor: "pointer",
+                        };
+                      } else if (hasInbound) {
+                        cellStyle = {
+                          backgroundColor: "#fff3cd",
+                          cursor: "pointer",
+                        };
+                      } else if (hasOutbound) {
+                        cellStyle = {
+                          backgroundColor: "#cce5ff",
+                          cursor: "pointer",
+                        };
+                      }
+
+                      return (
+                        <Table.Td
+                          key={o}
+                          onDoubleClick={() => copyToClipboard(value)}
+                          style={cellStyle}
+                        >
+                          <DataCell
+                            value={value}
+                            outbound={outbound[column]}
+                            inbound={inbound[column]}
+                          />
+                        </Table.Td>
+                      );
+                    })}
+                  </Table.Tr>
+                ))}
+              </Table.Tbody>
+            </Table>
+          </Stack>
         </div>
       </HTMLContainer>
     );

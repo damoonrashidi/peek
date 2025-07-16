@@ -127,7 +127,7 @@ export const DataCell = ({
 
   if (typeof value === "boolean") {
     return value ? (
-      <Text fs="italic" c="green">
+      <Text fs="italic" c="blue">
         TRUE
       </Text>
     ) : (

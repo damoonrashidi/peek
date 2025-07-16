@@ -1,12 +1,12 @@
 # V.1
 
-- [ ] Save/Load canvas (queries + connection)
-- [ ] Save/Load connections
+- [~] Save/Load canvas (queries + connection) -> Workspaces
+- [ ] Save/Load connections -> Workspaces
 - [ ] Show schema graph
 - [ ] Better completions based on query AST
 - [ ] Query meta info (execution time, tables)
 - [ ] Pagination on query results if limit/offset in query
-- [ ] Polling Queries
+- [ ] Polling/Live Queries
 - [ ] export result as json/csv
 
 # V.2
