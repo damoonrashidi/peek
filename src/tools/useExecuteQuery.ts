@@ -14,8 +14,8 @@ export const useExecuteQuery = (shape: TLShape) => {
 
         const x = editor.getSelectionPageBounds()?.right ?? shape.x + 500;
 
-        if (result.length === 0) {
-          return;
+        if (queries.length > 0 && result.length === 0) {
+          continue;
         }
 
         const columnCount = result[0]?.length ?? 0;

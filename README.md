@@ -1,7 +1,25 @@
-# Tauri + React + Typescript
+## Installation
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
+1. Clone this repo
+2. yarn tauri build
 
-## Recommended IDE Setup
+## TODO
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+# V.1
+
+- [~] Save/Load canvas (queries + connection) -> Workspaces
+- [ ] Save/Load connections -> Workspaces
+- [ ] Show schema graph
+- [ ] Better completions based on query AST
+- [ ] Query meta info (execution time, tables)
+- [ ] Pagination on query results if limit/offset in query
+- [ ] Polling/Live Queries
+- [ ] export result as json/csv
+
+# V.2
+
+- [ ] Support for more databases
+
+# V.3
+
+- [ ] Support for more datasources (hubspot, salesforce, etc.)

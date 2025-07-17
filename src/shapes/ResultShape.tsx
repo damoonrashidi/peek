@@ -36,14 +36,14 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
     const isEditing = this.editor.getEditingShapeId() === shape.id;
     const schema = useAtomValue(schemaAtom);
 
-    const headers = shape.props.data[0].map(([key]) => key);
+    const headers = (shape.props.data[0] ?? []).map(([key]) => key);
     const totalRows = shape.props.data.length;
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const { visibleStartIndex, visibleEndIndex, rowHeight } =
       useVirtualizedTable({
         totalRows,
         scrollContainerRef,
-        data: shape.props.data, // Pass data for row height measurement
+        data: shape.props.data,
       });
 
     const visibleRows = shape.props.data.slice(
@@ -61,11 +61,11 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
       return (
         <HTMLContainer>
           <div
-            className="no-results"
             style={{
               width: shape.props.w,
               height: shape.props.h,
             }}
+            className="no-results"
           >
             No results
           </div>

@@ -1,7 +1,7 @@
 .no-results {
     border-radius: 4px;
-    background: var(--rp-surface);
-    border: 1px solid var(--rp-base);
+    background: var(--cell-base);
+    border: 1px solid var(--border-base);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -20,11 +20,17 @@
 .inbound {
     background: var(--inbound-key);
     cursor: pointer;
+    &:hover {
+        background: var(--inbound-key-hover);
+    }
 }
 
 .outbound {
     background: var(--outbound-key);
     cursor: pointer;
+    &:hover {
+        background: var(--outbound-key-hover);
+    }
 }
 
 .even:not(.inbound, .outbound) {

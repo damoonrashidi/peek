@@ -42,6 +42,37 @@ export class QueryShapeUtil extends ShapeUtil<QueryShape> {
 
     const isEditing = this.editor.getEditingShapeId() === shape.id;
 
+    const runQuery = () => {
+      const editingShapeId = this.editor.getEditingShapeId();
+      if (!editingShapeId) {
+        return;
+      }
+      const editorInstance = this.editorInstances.get(editingShapeId);
+      if (!editorInstance) {
+        return;
+      }
+
+      executeQuery([editorInstance.getValue()]);
+    };
+
+    const formatQuery = () => {
+      const editingShapeId = this.editor.getEditingShapeId();
+      if (!editingShapeId) {
+        return;
+      }
+      const editorInstance = this.editorInstances.get(editingShapeId);
+      if (!editorInstance) {
+        return;
+      }
+
+      const formatted = format(editorInstance.getValue(), {
+        keywordCase: "upper",
+        functionCase: "upper",
+      });
+
+      editorInstance?.setValue(formatted);
+    };
+
     return (
       <HTMLContainer
         id={shape.id}
@@ -55,39 +86,12 @@ export class QueryShapeUtil extends ShapeUtil<QueryShape> {
 
             editor.addCommand(
               monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter,
-              () => {
-                const editingShapeId = this.editor.getEditingShapeId();
-                if (!editingShapeId) {
-                  return;
-                }
-                const editorInstance = this.editorInstances.get(editingShapeId);
-                if (!editorInstance) {
-                  return;
-                }
-
-                executeQuery([editorInstance.getValue()]);
-              },
+              runQuery,
             );
 
             editor.addCommand(
               monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyI,
-              () => {
-                const editingShapeId = this.editor.getEditingShapeId();
-                if (!editingShapeId) {
-                  return;
-                }
-                const editorInstance = this.editorInstances.get(editingShapeId);
-                if (!editorInstance) {
-                  return;
-                }
-
-                const formatted = format(editorInstance.getValue(), {
-                  keywordCase: "upper",
-                  functionCase: "upper",
-                });
-
-                editorInstance?.setValue(formatted);
-              },
+              formatQuery,
             );
 
             if (!hasRegisteredProvider) {

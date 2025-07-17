@@ -4,7 +4,9 @@ body {
 
 :root {
     --inbound-key: hsl(210deg, 80%, 90%);
+    --inbound-key-hover: hsl(210deg, 80%, 85%);
     --outbound-key: hsl(20deg, 80%, 90%);
+    --outbound-key-hover: hsl(20deg, 80%, 85%);
     --border-base: hsl(0deg, 0%, 70%);
     --cell-base: hsl(0deg, 0%, 98%);
     --cell-striped: hsl(0deg, 0%, 95%);

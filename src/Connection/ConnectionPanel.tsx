@@ -7,7 +7,7 @@ import { useState } from "react";
 export const ConnectionPanel = () => {
   const [, setSchema] = useAtom(schemaAtom);
   const [connectionString, setConnectionString] = useState(
-    "postgres://dbuser:dbpassword@localhost/nesso",
+    "postgres://USER:PASS@localhost/DB",
   );
   const [showModal, setShowModal] = useState(false);
   const [, setHasRegisteredProvider] = useAtom(providerRegistrationAtom);
