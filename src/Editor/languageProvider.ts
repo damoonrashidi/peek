@@ -87,7 +87,13 @@ export const createSqlProvider = ({
     model: any,
     position: any,
   ): {
-    type: "table" | "column" | "table_for_join" | "where_clause" | "general";
+    type:
+      | "table"
+      | "column"
+      | "table_for_join"
+      | "where_clause"
+      | "join_on_clause"
+      | "general";
     tableContext?: string;
   } => {
     if (!node) return { type: "general" };
@@ -114,6 +120,14 @@ export const createSqlProvider = ({
     );
     if (afterJoinMatch) {
       return { type: "table_for_join" };
+    }
+
+    // Check for JOIN ... ON position - simplified version
+    const onMatch = textBeforeCursorTrimmed.match(
+      /\b(INNER\s+JOIN|LEFT\s+JOIN|RIGHT\s+JOIN|FULL\s+JOIN|JOIN)\s+(\w+)(?:\s+(\w+))?\s+ON\s*$/i,
+    );
+    if (onMatch) {
+      return { type: "join_on_clause" };
     }
 
     const afterWhereMatch = textBeforeCursorTrimmed.match(/\bWHERE\s*$/i);
@@ -252,6 +266,12 @@ export const createSqlProvider = ({
       model.getOffsetAt(position),
     );
 
+    // Very specific check for JOIN ON clause - only when directly after "ON"
+    const directOnMatch = textBeforeCursorTrimmed.match(/\bON\s*$/i);
+    if (directOnMatch) {
+      return { type: "join_on_clause" };
+    }
+
     const whereMatch = textBeforePosition.match(
       /\bWHERE\b(?!.*\bORDER\b)(?!.*\bGROUP\b)(?!.*\bHAVING\b)/is,
     );
@@ -269,6 +289,17 @@ export const createSqlProvider = ({
     );
     if (fromMatch) {
       return { type: "table" };
+    }
+
+    // Check if we're in the middle of a JOIN ON clause condition (only after other checks fail)
+    const onConditionMatch = textBeforePosition.match(
+      /\bON\s+[^;]*?(?:AND|OR)?\s*$/i,
+    );
+    if (
+      onConditionMatch &&
+      !textBeforePosition.match(/\b(?:WHERE|ORDER|GROUP|HAVING|LIMIT)\b/i)
+    ) {
+      return { type: "join_on_clause" };
     }
 
     return { type: "general" };
@@ -475,6 +506,44 @@ export const createSqlProvider = ({
               range,
               documentation: `Joinable table: ${tableName}`,
             }));
+            break;
+
+          case "join_on_clause":
+            // For now, provide basic JOIN condition suggestions
+            suggestions = [
+              {
+                label: "= ",
+                kind: languages.CompletionItemKind.Operator,
+                insertText: "= ",
+                range,
+                documentation: "Equality operator",
+              },
+              {
+                label: "AND ",
+                kind: languages.CompletionItemKind.Keyword,
+                insertText: "AND ",
+                range,
+                documentation: "Logical AND operator",
+              },
+              {
+                label: "OR ",
+                kind: languages.CompletionItemKind.Keyword,
+                insertText: "OR ",
+                range,
+                documentation: "Logical OR operator",
+              },
+            ];
+
+            // Also include all available columns
+            suggestions.push(
+              ...allColumns.map((column) => ({
+                label: column,
+                kind: languages.CompletionItemKind.Field,
+                insertText: column,
+                range,
+                documentation: `Column: ${column}`,
+              })),
+            );
             break;
 
           case "general":
