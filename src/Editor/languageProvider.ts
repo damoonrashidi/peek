@@ -441,24 +441,31 @@ export const createSqlProvider = ({
                 documentation: `Column from ${context.tableContext}: ${column}`,
               }));
             } else {
-              const aliases = getTableAliases(tree.rootNode);
-              const aliasCompletions = Array.from(aliases.keys()).map(
-                (alias) => ({
+              const availableContext = getAvailableTablesAndAliases(
+                tree.rootNode,
+              );
+
+              const aliasCompletions = Array.from(
+                availableContext.tables.keys(),
+              )
+                .filter((alias) => alias !== availableContext.tables.get(alias))
+                .map((alias) => ({
                   label: alias,
                   kind: languages.CompletionItemKind.Variable,
                   insertText: alias,
                   range,
-                  documentation: `Table alias: ${alias} (${aliases.get(alias)})`,
+                  documentation: `Table alias: ${alias} (${availableContext.tables.get(alias)})`,
+                }));
+
+              const columnCompletions = availableContext.availableColumns.map(
+                (column) => ({
+                  label: column,
+                  kind: languages.CompletionItemKind.Field,
+                  insertText: column,
+                  range,
+                  documentation: `Column: ${column}`,
                 }),
               );
-
-              const columnCompletions = allColumns.map((column) => ({
-                label: column,
-                kind: languages.CompletionItemKind.Field,
-                insertText: column,
-                range,
-                documentation: `Column: ${column}`,
-              }));
 
               suggestions = [...aliasCompletions, ...columnCompletions];
             }
