@@ -14,30 +14,32 @@ export const DataCell = ({
 }) => {
   const editor = useEditor();
   const shape = editor.getOnlySelectedShape()!;
-  const executeQuery = useExecuteQuery(shape);
+  const executeQuery = useExecuteQuery();
 
   const openOutboundReferences = async () => {
     const queries = outbound.map(
-      (ref) => `SELECT * FROM ${ref.table} WHERE ${ref.column} = '${value}'`,
+      (ref) =>
+        `SELECT * FROM ${ref.table} WHERE ${ref.column} = '${value}' LIMIT 300`,
     );
 
     if (!shape) {
       return;
     }
 
-    executeQuery(queries);
+    executeQuery(shape, queries);
   };
 
   const openInboundReferences = async () => {
     const queries = inbound.map(
-      (ref) => `SELECT * FROM ${ref.table} WHERE ${ref.column} = '${value}'`,
+      (ref) =>
+        `SELECT * FROM ${ref.table} WHERE ${ref.column} = '${value}' LIMIT 300`,
     );
 
     if (!shape) {
       return;
     }
 
-    executeQuery(queries);
+    executeQuery(shape, queries);
   };
 
   if (typeof value === "object" && value !== null) {

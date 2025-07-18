@@ -2,10 +2,10 @@ import { createShapeId, TLShape, useEditor } from "tldraw";
 import { createArrowBetweenShapes } from "./createArrowBetweenShapes";
 import { invoke } from "@tauri-apps/api/core";
 
-export const useExecuteQuery = (shape: TLShape) => {
+export const useExecuteQuery = () => {
   const editor = useEditor();
 
-  return async (queries: string[]) => {
+  return async (shape: TLShape, queries: string[]) => {
     for (let i = 0; i < queries.length; i++) {
       const query = queries[i];
       try {

@@ -40,7 +40,7 @@ export class QueryShapeUtil extends ShapeUtil<QueryShape> {
 
   component(shape: QueryShape) {
     const schema = useAtomValue(schemaAtom);
-    const executeQuery = useExecuteQuery(shape);
+    const executeQuery = useExecuteQuery();
     const [hasRegisteredProvider, setHasRegisteredProvider] = useAtom(
       providerRegistrationAtom,
     );
@@ -50,16 +50,16 @@ export class QueryShapeUtil extends ShapeUtil<QueryShape> {
     const isEditing = this.editor.getEditingShapeId() === shape.id;
 
     const runQuery = () => {
-      const editingShapeId = this.editor.getEditingShapeId();
-      if (!editingShapeId) {
+      const editingShape = this.editor.getEditingShape();
+      if (!editingShape) {
         return;
       }
-      const editorInstance = this.editorInstances.get(editingShapeId);
+      const editorInstance = this.editorInstances.get(editingShape.id);
       if (!editorInstance) {
         return;
       }
 
-      executeQuery([editorInstance.getValue()]);
+      executeQuery(editingShape, [editorInstance.getValue()]);
     };
 
     const formatQuery = () => {

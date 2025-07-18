@@ -15,7 +15,7 @@ export const QueryContextualToolbarComponent = track(() => {
     .getSelectedShapes()
     .find((shape) => shape.type === "query")!;
 
-  const executeQuery = useExecuteQuery(shape);
+  const executeQuery = useExecuteQuery();
 
   const getSelectionBounds = () => {
     const fullBounds = editor.getSelectionRotatedScreenBounds();
@@ -29,7 +29,7 @@ export const QueryContextualToolbarComponent = track(() => {
     const query = (shape.props as ReturnType<QueryShapeUtil["getDefaultProps"]>)
       .query;
 
-    executeQuery([query]);
+    executeQuery(shape, [query]);
   };
 
   return (
