@@ -8,11 +8,18 @@ import { QueryShapeUtil } from "./shapes/QueryShape";
 import { QueryTool } from "./tools/QueryTool";
 import { ResultShapeUtil } from "./shapes/ResultShape";
 import { invoke } from "@tauri-apps/api/core";
-import { persistanceAtom, schemaAtom } from "./state";
+import {
+  persistanceAtom,
+  schemaAtom,
+  sqlLanguageAtom,
+  sqlParserAtom,
+} from "./state";
 import { useAtom, useAtomValue } from "jotai";
 import { BarChartShapeUtil } from "./shapes/BarChartShape";
 import { createTheme, MantineProvider } from "@mantine/core";
 import { QueryErrorShapeUtil } from "./shapes/ErrorShape";
+
+import { Parser, Language } from "web-tree-sitter";
 
 const customShapes = [
   QueryShapeUtil,
@@ -30,12 +37,25 @@ const fetchSchema = async () => {
 function App() {
   const ref = useRef<Editor>();
   const [, setSchema] = useAtom(schemaAtom);
+  const [, setSqlParser] = useAtom(sqlParserAtom);
+  const [, sqlSqlLanguage] = useAtom(sqlLanguageAtom);
   const persistanceKey = useAtomValue(persistanceAtom);
+  const initTreeSitter = async () => {
+    await Parser.init();
+
+    const wasmPath = new URL("/tree-sitter-sql.wasm", window.location.origin)
+      .href;
+    const SQL = await Language.load(wasmPath);
+
+    const parser = new Parser();
+    parser.setLanguage(SQL);
+    setSqlParser(parser);
+    sqlSqlLanguage(SQL);
+  };
 
   useEffect(() => {
-    fetchSchema().then((schema) => {
-      setSchema(schema);
-    });
+    fetchSchema().then(setSchema);
+    initTreeSitter().then(() => {});
   }, []);
 
   return (

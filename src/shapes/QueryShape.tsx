@@ -13,7 +13,12 @@ import { editor } from "monaco-editor";
 import { Monaco } from "@monaco-editor/react";
 import { createSqlProvider } from "../Editor/languageProvider";
 import { useAtomValue } from "jotai";
-import { providerRegistrationAtom, schemaAtom } from "../state";
+import {
+  providerRegistrationAtom,
+  schemaAtom,
+  sqlLanguageAtom,
+  sqlParserAtom,
+} from "../state";
 import { useAtom } from "jotai";
 import { format } from "sql-formatter";
 import { useExecuteQuery } from "../tools/useExecuteQuery";
@@ -39,6 +44,8 @@ export class QueryShapeUtil extends ShapeUtil<QueryShape> {
     const [hasRegisteredProvider, setHasRegisteredProvider] = useAtom(
       providerRegistrationAtom,
     );
+    const parser = useAtomValue(sqlParserAtom);
+    const language = useAtomValue(sqlLanguageAtom);
 
     const isEditing = this.editor.getEditingShapeId() === shape.id;
 
@@ -94,8 +101,12 @@ export class QueryShapeUtil extends ShapeUtil<QueryShape> {
               formatQuery,
             );
 
-            if (!hasRegisteredProvider) {
-              const provider = createSqlProvider(schema);
+            if (!hasRegisteredProvider && parser && language) {
+              const provider = createSqlProvider({
+                ...schema,
+                parser,
+                language,
+              });
               monaco.languages.registerCompletionItemProvider("sql", provider);
               setHasRegisteredProvider(true);
             }
