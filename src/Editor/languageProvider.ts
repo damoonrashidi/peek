@@ -363,7 +363,6 @@ export const createSqlProvider = ({
       try {
         const tree = parser.parse(query);
         if (!tree) {
-          console.log("no tree");
           return { suggestions: [] };
         }
 
@@ -379,7 +378,6 @@ export const createSqlProvider = ({
           position.lineNumber,
           position.column,
         );
-        console.log("Node at cursor:", nodeAtCursor?.type, nodeAtCursor?.text);
 
         const context = getCompletionContext(
           nodeAtCursor,
@@ -387,7 +385,6 @@ export const createSqlProvider = ({
           model,
           position,
         );
-        console.log("Completion context:", context);
 
         let suggestions: languages.CompletionItem[] = [];
 
