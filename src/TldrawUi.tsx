@@ -9,6 +9,7 @@ import {
 } from "tldraw";
 import { CustomContextualToolbarComponent } from "./tools/CustomToolbar";
 import { ConnectionPanel } from "./Connection/ConnectionPanel";
+import { CustomContextMenu } from "./tools/CustomContextMenu";
 
 export const customUiOverrides: TLUiOverrides = {
   tools(editor, tools) {
@@ -24,6 +25,65 @@ export const customUiOverrides: TLUiOverrides = {
     return tools;
   },
   actions(editor, actions) {
+    delete actions["send-to-front"];
+    delete actions["bring-to-front"];
+
+    actions["select-next-query"] = {
+      id: "select-next-query",
+      label: "Select next query",
+      readonlyOk: true,
+      kbd: "cmd+],ctrl+]",
+      onSelect() {
+        const current = editor.getOnlySelectedShape();
+
+        if (!current || current.type !== "query") {
+          return;
+        }
+
+        const queryShapes = editor
+          .getCurrentPageShapes()
+          .filter((shape) => shape.type === "query");
+
+        const currentShapeIndex = queryShapes.findIndex(
+          (shape) => shape.id.toString() === current.id.toString(),
+        );
+
+        editor.select(
+          queryShapes[(currentShapeIndex + 1) % queryShapes.length].id,
+        );
+        editor.zoomToSelection();
+      },
+    };
+
+    actions["select-previous-query"] = {
+      id: "select-previous-query",
+      label: "Select previous query",
+      readonlyOk: true,
+      kbd: "cmd+[,ctrl+[",
+      onSelect() {
+        const current = editor.getOnlySelectedShape();
+
+        if (!current || current.type !== "query") {
+          return;
+        }
+
+        const queryShapes = editor
+          .getCurrentPageShapes()
+          .filter((shape) => shape.type === "query");
+
+        const currentShapeIndex = queryShapes.findIndex(
+          (shape) => shape.id.toString() === current.id.toString(),
+        );
+
+        editor.select(
+          queryShapes[
+            (currentShapeIndex - 1 + queryShapes.length) % queryShapes.length
+          ].id,
+        );
+        editor.zoomToSelection();
+      },
+    };
+
     actions["query"] = {
       id: "query-actions",
       label: "Create a new Query",
@@ -70,6 +130,7 @@ export const customComponents: TLComponents = {
   HelpMenu: null,
   StylePanel: null,
   QuickActions: null,
+  ContextMenu: CustomContextMenu,
   InFrontOfTheCanvas: CustomContextualToolbarComponent,
   KeyboardShortcutsDialog: (props) => {
     return (

@@ -202,7 +202,6 @@ async fn set_connection(
 pub fn run() {
     tauri::Builder::default()
         .manage(Mutex::new(AppData::default()))
-        .plugin(tauri_plugin_sql::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             get_results,

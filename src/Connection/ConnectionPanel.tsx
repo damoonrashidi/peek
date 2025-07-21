@@ -1,7 +1,7 @@
 import { Button, Input, Modal } from "@mantine/core";
 import { invoke } from "@tauri-apps/api/core";
 import { useAtom } from "jotai";
-import { providerRegistrationAtom, schemaAtom } from "../state";
+import { schemaAtom } from "../state";
 import { useState } from "react";
 
 export const ConnectionPanel = () => {
@@ -10,15 +10,23 @@ export const ConnectionPanel = () => {
     "postgres://dbuser:dbpassword@localhost/nesso",
   );
   const [showModal, setShowModal] = useState(false);
-  const [, setHasRegisteredProvider] = useAtom(providerRegistrationAtom);
+  const [isConnecting, setIsConnecting] = useState(false);
+
   const setConnection = async () => {
-    await invoke("set_connection", { connectionString });
+    setIsConnecting(true);
 
-    const response = (await invoke("get_schema")) as string;
-    const schema = JSON.parse(response);
-    setHasRegisteredProvider(false);
+    try {
+      await invoke("set_connection", { connectionString });
 
-    setSchema(schema);
+      const response = (await invoke("get_schema")) as string;
+      const schema = JSON.parse(response);
+
+      setSchema(schema);
+      setShowModal(false);
+    } catch {
+    } finally {
+      setIsConnecting(false);
+    }
   };
 
   return (
@@ -27,20 +35,25 @@ export const ConnectionPanel = () => {
         pointerEvents: "all",
       }}
     >
-      <Modal opened={showModal} onClose={() => setShowModal(false)}>
+      <Modal
+        opened={showModal}
+        onClose={() => setShowModal(false)}
+        title="Database Connection"
+      >
         <Input
           placeholder="Connection string"
           type="text"
           value={connectionString}
           onChange={(e) => setConnectionString(e.currentTarget.value)}
+          disabled={isConnecting}
         />
         <Button
-          onClick={() => {
-            setConnection();
-            setShowModal(false);
-          }}
+          onClick={setConnection}
+          loading={isConnecting}
+          fullWidth
+          mt="md"
         >
-          Save
+          {isConnecting ? "Connecting..." : "Connect"}
         </Button>
       </Modal>
       <Button variant="light" onClick={() => setShowModal(true)}>

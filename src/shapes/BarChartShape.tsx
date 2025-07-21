@@ -32,7 +32,10 @@ export class BarChartShapeUtil extends ShapeUtil<BarChartShape> {
     ) ?? ["name"];
 
     const series = Object.entries(shape.props.data[0])
-      .filter(([, value]) => typeof value === "number")
+      .filter(
+        ([key, value]) =>
+          typeof value === "number" && key !== "id" && !key.endsWith("_id"),
+      )
       .map(([key]) => ({
         name: key,
       }));
@@ -52,11 +55,6 @@ export class BarChartShapeUtil extends ShapeUtil<BarChartShape> {
             data={shape.props.data}
             dataKey={dataKey}
             series={series}
-            xAxisProps={{
-              interval: 0,
-              angle: -10,
-              textAnchor: "end",
-            }}
             tickLine="y"
           />
         </div>

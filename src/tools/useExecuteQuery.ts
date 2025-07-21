@@ -14,37 +14,42 @@ export const useExecuteQuery = () => {
 
         const x = editor.getSelectionPageBounds()?.right ?? shape.x + 500;
 
-        if (queries.length > 0 && result.length === 0) {
+        if (queries.length > 1 && result.length === 0) {
           continue;
         }
 
         const columnCount = result[0]?.length ?? 0;
         const resultShapeId = createShapeId(shape.id + "-result-" + i);
 
-        editor.createShape({
-          id: resultShapeId,
-          type: "result",
-          x: x + 50,
-          y: shape.y,
-          props: {
-            data: result,
-            query,
-            w: Math.max(columnCount * 250, 200),
-            h: Math.min(result.length * 45 + 40, 1500),
-          },
-        });
+        const resultShape = editor.getShape(resultShapeId);
+
+        if (resultShape) {
+          editor.updateShape({
+            id: resultShapeId,
+            type: "result",
+            props: {
+              data: result,
+              query,
+            },
+          });
+        } else {
+          editor.createShape({
+            id: resultShapeId,
+            type: "result",
+            x: x + 50,
+            y: shape.y,
+            props: {
+              data: result,
+              query,
+              w: Math.max(columnCount * 250, 200),
+              h: Math.min(result.length * 45 + 40, 1500),
+            },
+          });
+          createArrowBetweenShapes(editor, shape.id, resultShapeId);
+        }
 
         editor.select(resultShapeId);
         editor.zoomToSelection({ animation: { duration: 300 } });
-
-        // const group = [
-        //   editor.getShape(resultShapeId),
-        //   editor.getShape(toolbarShapeId),
-        // ] as TLShape[];
-
-        // editor.groupShapes(group);
-
-        createArrowBetweenShapes(editor, shape.id, resultShapeId);
       } catch (e) {
         const errorShapeId = createShapeId(shape.id + "-error");
 

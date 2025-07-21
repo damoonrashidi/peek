@@ -1,5 +1,4 @@
-import { Stack, Table } from "@mantine/core";
-
+import { Paper, Stack, Table, Text } from "@mantine/core";
 import {
   Geometry2d,
   HTMLContainer,
@@ -18,7 +17,7 @@ import {
 } from "../ResultTable/findReferences";
 import { Parser } from "node-sql-parser";
 import { useVirtualizedTable } from "../tools/useVirtualizedTable";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 
 type ResultShape = TLBaseShape<
   "result",
@@ -60,28 +59,31 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
     if (shape.props.data.length === 0) {
       return (
         <HTMLContainer>
-          <div
-            style={{
-              width: shape.props.w,
-              height: shape.props.h,
-            }}
-            className="no-results"
-          >
-            No results
-          </div>
+          <Paper shadow="md" color="blue" c="blue">
+            <div
+              style={{
+                width: shape.props.w,
+                height: shape.props.h,
+              }}
+              className="no-results"
+            >
+              No results
+            </div>
+          </Paper>
         </HTMLContainer>
       );
     }
 
-    const outbound: Record<string, { table: string; column: string }[]> = {};
-    headers.forEach((column) => {
-      outbound[column] = getInboundReferences(ast, schema.references, column);
-    });
+    const { outbound, inbound } = useMemo(() => {
+      const outbound: Record<string, { table: string; column: string }[]> = {};
+      const inbound: Record<string, { table: string; column: string }[]> = {};
+      headers.forEach((column) => {
+        outbound[column] = getInboundReferences(ast, schema.references, column);
+        inbound[column] = getOutboundReferences(ast, schema.references, column);
+      });
 
-    const inbound: Record<string, { table: string; column: string }[]> = {};
-    headers.forEach((column) => {
-      inbound[column] = getOutboundReferences(ast, schema.references, column);
-    });
+      return { outbound, inbound };
+    }, [headers, ast, schema.references]);
 
     return (
       <HTMLContainer id={shape.id}>
@@ -102,8 +104,6 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
             <Table
               stickyHeader
               striped
-              highlightOnHover
-              withTableBorder
               withColumnBorders
               borderColor="var(--border-base)"
               style={{
@@ -113,7 +113,7 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
               }}
             >
               <Table.Thead>
-                <Table.Tr>
+                <Table.Tr className="header-row">
                   {headers.map((header, i) => {
                     const hasInbound = inbound[header]?.length > 0;
                     const hasOutbound = outbound[header]?.length > 0;
@@ -127,10 +127,12 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
 
                     return (
                       <Table.Th key={i} className={headerClasses.join(" ")}>
-                        {header}
-                        {hasInbound && hasOutbound && " ↕"}
-                        {hasInbound && !hasOutbound && " ↑"}
-                        {hasOutbound && !hasInbound && " ↓"}
+                        <Text fw="bold" c="gray">
+                          {header}
+                          {hasInbound && hasOutbound && " ↕"}
+                          {hasInbound && !hasOutbound && " ↑"}
+                          {hasOutbound && !hasInbound && " ↓"}
+                        </Text>
                       </Table.Th>
                     );
                   })}

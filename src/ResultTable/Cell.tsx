@@ -2,6 +2,7 @@ import { Text } from "@mantine/core";
 import { CellReference } from "./findReferences";
 import { useEditor } from "tldraw";
 import { useExecuteQuery } from "../tools/useExecuteQuery";
+import "./Cell.css";
 
 export const DataCell = ({
   value,
@@ -43,15 +44,27 @@ export const DataCell = ({
   };
 
   if (typeof value === "object" && value !== null) {
-    return <pre>{JSON.stringify(value, null, 2)}</pre>;
+    return (
+      <Text>
+        <pre>{JSON.stringify(value, null, 2)}</pre>
+      </Text>
+    );
   }
 
   if (typeof value === "string" || typeof value === "number") {
     if (inbound.length > 0) {
-      return <div onClick={openInboundReferences}>{value}</div>;
+      return (
+        <div onClick={openInboundReferences} className="reference">
+          <Text c="blue">{value}</Text>
+        </div>
+      );
     }
     if (outbound.length > 0) {
-      return <div onClick={openOutboundReferences}>{value}</div>;
+      return (
+        <div onClick={openOutboundReferences} className="reference">
+          <Text c="blue">{value}</Text>
+        </div>
+      );
     }
     return value;
   }

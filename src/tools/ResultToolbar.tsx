@@ -18,7 +18,10 @@ export const ResultContextualToolbarComponent = () => {
 
   const canChart =
     props.data.length > 0 &&
-    props.data[0].find(([, value]) => typeof value === "number");
+    props.data[0].find(
+      ([key, value]) =>
+        typeof value === "number" && key !== "id" && !key.endsWith("_id"),
+    );
 
   const tables = new Parser()
     .tableList(props.query)

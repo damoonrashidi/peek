@@ -11,15 +11,6 @@ import "./Query.css";
 import { SqlEditor } from "../Editor/SqlEditor";
 import { editor } from "monaco-editor";
 import { Monaco } from "@monaco-editor/react";
-import { createSqlProvider } from "../Editor/languageProvider";
-import { useAtomValue } from "jotai";
-import {
-  providerRegistrationAtom,
-  schemaAtom,
-  sqlLanguageAtom,
-  sqlParserAtom,
-} from "../state";
-import { useAtom } from "jotai";
 import { format } from "sql-formatter";
 import { useExecuteQuery } from "../tools/useExecuteQuery";
 
@@ -39,13 +30,7 @@ export class QueryShapeUtil extends ShapeUtil<QueryShape> {
   }
 
   component(shape: QueryShape) {
-    const schema = useAtomValue(schemaAtom);
     const executeQuery = useExecuteQuery();
-    const [hasRegisteredProvider, setHasRegisteredProvider] = useAtom(
-      providerRegistrationAtom,
-    );
-    const parser = useAtomValue(sqlParserAtom);
-    const language = useAtomValue(sqlLanguageAtom);
 
     const isEditing = this.editor.getEditingShapeId() === shape.id;
 
@@ -100,16 +85,6 @@ export class QueryShapeUtil extends ShapeUtil<QueryShape> {
               monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyI,
               formatQuery,
             );
-
-            if (!hasRegisteredProvider && parser && language) {
-              const provider = createSqlProvider({
-                ...schema,
-                parser,
-                language,
-              });
-              monaco.languages.registerCompletionItemProvider("sql", provider);
-              setHasRegisteredProvider(true);
-            }
           }}
           onQueryChange={(query) =>
             this.editor.updateShape<QueryShape>({

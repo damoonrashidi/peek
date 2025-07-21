@@ -86,7 +86,7 @@ export function createArrowBetweenShapes(
       y: arrowPointInParentSpace.y,
       props: {
         kind: "elbow",
-        size: "m",
+        size: "s",
       },
     });
 

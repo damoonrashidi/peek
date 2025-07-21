@@ -10,8 +10,6 @@ export const schemaAtom = atom<{
   references: {},
 });
 
-export const providerRegistrationAtom = atom(false);
-
 export const persistanceAtom = atomWithStorage<string>(
   "persistance",
   "default",

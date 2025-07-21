@@ -15,6 +15,10 @@
 - [ ] Pagination on query results if limit/offset in query
 - [ ] Polling/Live Queries
 - [ ] export result as json/csv
+- [ ] Query history per Query shape, after each succesful query
+- [ ] Context menu on result shape to export to json, csv
+- [ ] Context menu on result shape to select result tree
+- [ ] AI integration AI -> Query -> Result
 
 # V.2
 

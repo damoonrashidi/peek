@@ -16,8 +16,6 @@ export const useCreateChart = (shape: TLShape) => {
       return;
     }
 
-    const x = editor.getSelectionPageBounds()?.right;
-
     const fields = [];
 
     for (const row of props.data) {
@@ -39,17 +37,26 @@ export const useCreateChart = (shape: TLShape) => {
 
     const chartShapeId = createShapeId(shape.id + "-chart");
 
-    editor.createShape({
-      type: "barchart",
-      id: chartShapeId,
-      x,
-      y: shape.y,
-      props: {
-        data: fields,
-        w: 500,
-        h: 500,
-      },
-    });
+    const chartShape = editor.getShape(chartShapeId);
+
+    if (chartShape) {
+      editor.updateShape({
+        id: chartShapeId,
+        type: "barchart",
+      });
+    } else {
+      editor.createShape({
+        type: "barchart",
+        id: chartShapeId,
+        x: shape.x,
+        y: shape.y - 540,
+        props: {
+          data: fields,
+          w: props.w,
+          h: 500,
+        },
+      });
+    }
 
     editor.select(chartShapeId);
     editor.zoomToSelection({ animation: { duration: 300 } });

@@ -20,6 +20,7 @@ import { createTheme, MantineProvider } from "@mantine/core";
 import { QueryErrorShapeUtil } from "./shapes/ErrorShape";
 
 import { Parser, Language } from "web-tree-sitter";
+import { MonacoManager } from "./Editor/MonacoManager";
 
 const customShapes = [
   QueryShapeUtil,
@@ -40,6 +41,7 @@ function App() {
   const [, setSqlParser] = useAtom(sqlParserAtom);
   const [, sqlSqlLanguage] = useAtom(sqlLanguageAtom);
   const persistanceKey = useAtomValue(persistanceAtom);
+
   const initTreeSitter = async () => {
     await Parser.init();
 
@@ -61,6 +63,7 @@ function App() {
   return (
     <MantineProvider theme={theme}>
       <div style={{ position: "fixed", inset: 0 }}>
+        <MonacoManager />
         <Tldraw
           onMount={(editor) => {
             ref.current = editor;
