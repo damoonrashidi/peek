@@ -8,13 +8,22 @@
 
 .connection {
     cursor: pointer;
-    border-radius: 8px;
-    padding: 16px;
+    border-radius: 999px;
+    padding: 8px 16px;
+    width: 100%;
+    align-items: center;
     margin-bottom: 8px;
-    &.active {
+    transition: background 0.1s ease-out;
+    &[data-is-active="true"] {
         background: hsl(190deg, 80%, 70%);
     }
     &:hover {
         background: hsl(190deg, 80%, 80%);
     }
+}
+
+.color {
+    width: 16px;
+    height: 16px;
+    border-radius: 999px;
 }

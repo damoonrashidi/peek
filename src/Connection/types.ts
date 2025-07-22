@@ -6,4 +6,5 @@ export interface Workspace {
 export interface Connection {
   name: string;
   url: string;
+  color: string;
 }

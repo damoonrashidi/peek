@@ -7,6 +7,7 @@ import {
   getSnapshot,
   loadSnapshot,
   Tldraw,
+  TLStore,
 } from "tldraw";
 import "tldraw/tldraw.css";
 import "@mantine/core/styles.css";
@@ -35,12 +36,8 @@ function App() {
   const snapshot = useAtomValue(
     snapshotForUrlAtom(activeConnection?.connection.url ?? "default"),
   );
-  const [store] = useState(
-    createTLStore({
-      shapeUtils: [...defaultShapeUtils, ...customShapes],
-      bindingUtils: [...defaultBindingUtils],
-    }),
-  );
+
+  const [store, setStore] = useState<TLStore>();
   const [, setSnapshots] = useAtom(snapshotsAtom);
 
   const initTreeSitter = async () => {
@@ -61,15 +58,23 @@ function App() {
   }, []);
 
   useEffect(() => {
+    const tlStore = createTLStore({
+      shapeUtils: [...defaultShapeUtils, ...customShapes],
+      bindingUtils: [...defaultBindingUtils],
+    });
+    setStore(tlStore);
+  }, []);
+
+  useEffect(() => {
     setTimeout(() => {
-      if (snapshot) {
+      if (snapshot && store) {
         loadSnapshot(store, snapshot);
       }
     }, 50);
   }, [activeConnection?.connection.url]);
 
   useEffect(() => {
-    const unsubscribe = store.listen(
+    const unsubscribe = store?.listen(
       () => {
         if (!activeConnection) {
           return;
@@ -95,6 +100,7 @@ function App() {
             ref.current = editor;
           }}
           store={store}
+          shapeUtils={customShapes}
           overrides={customUiOverrides}
           components={customComponents}
           tools={[QueryTool]}

@@ -1,4 +1,4 @@
-import { Button, Modal } from "@mantine/core";
+import { Button, Modal, Paper } from "@mantine/core";
 import { invoke } from "@tauri-apps/api/core";
 import { useAtom, useAtomValue } from "jotai";
 import { schemaAtom } from "../state";
@@ -61,7 +61,11 @@ export const ConnectionPanel = () => {
           {activeConnection.workspaceName} - {activeConnection.connection.name}
         </Button>
       ) : (
-        <Button onClick={() => setShowModal(true)}>Set connection</Button>
+        <Paper p={8} bg="transparent">
+          <Button onClick={() => setShowModal(true)} variant="light">
+            Workspaces
+          </Button>
+        </Paper>
       )}
     </div>
   );
