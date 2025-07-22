@@ -14,7 +14,10 @@ import { Monaco } from "@monaco-editor/react";
 import { format } from "sql-formatter";
 import { useExecuteQuery } from "../tools/useExecuteQuery";
 
-type QueryShape = TLBaseShape<"query", { query: string; w: number; h: number }>;
+export type QueryShape = TLBaseShape<
+  "query",
+  { query: string; w: number; h: number }
+>;
 
 export class QueryShapeUtil extends ShapeUtil<QueryShape> {
   static override type = "query" as const;

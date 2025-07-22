@@ -20,21 +20,16 @@ export const MonacoManager = () => {
       return;
     }
 
-    // Check if schema has actually changed
     const currentSchemaString = JSON.stringify(schema);
     if (currentSchemaString === lastSchemaRef.current) {
       return;
     }
 
-    // Dispose of the previous provider if it exists
     if (providerRef.current) {
-      console.log("Disposing old SQL completion provider");
       providerRef.current.dispose();
       providerRef.current = null;
     }
 
-    // Create and register the new provider
-    console.log("Registering new SQL completion provider with schema:", schema);
     const provider = createSqlProvider({
       ...schema,
       parser,
@@ -75,11 +70,9 @@ export const MonacoManager = () => {
           monacoRef.current = monaco;
           editorRef.current = editor;
 
-          // Register the provider once Monaco is ready
           registerCompletionProvider();
         }}
         options={{
-          // Minimal options since this editor is never visible
           readOnly: true,
           minimap: { enabled: false },
           lineNumbers: "off",

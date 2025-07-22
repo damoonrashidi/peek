@@ -1,22 +1,34 @@
-import { Button, Input, Modal } from "@mantine/core";
+import { Button, Modal } from "@mantine/core";
 import { invoke } from "@tauri-apps/api/core";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { schemaAtom } from "../state";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { WorkspacePanel } from "./WorkspacePanel";
+import { activeConnectionAtom } from "./state";
 
 export const ConnectionPanel = () => {
   const [, setSchema] = useAtom(schemaAtom);
-  const [connectionString, setConnectionString] = useState(
-    "postgres://dbuser:dbpassword@localhost/nesso",
-  );
   const [showModal, setShowModal] = useState(false);
-  const [isConnecting, setIsConnecting] = useState(false);
+  const [, setIsConnecting] = useState(false);
+  const activeConnection = useAtomValue(activeConnectionAtom);
 
-  const setConnection = async () => {
+  const fetchSchema = async () => {
+    const response = (await invoke("get_schema")) as string;
+    return JSON.parse(response);
+  };
+
+  useEffect(() => {
+    if (activeConnection) {
+      setConnection(activeConnection.connection.url);
+    }
+    fetchSchema().then(setSchema);
+  }, [activeConnection]);
+
+  const setConnection = async (url: string) => {
     setIsConnecting(true);
 
     try {
-      await invoke("set_connection", { connectionString });
+      await invoke("set_connection", { connectionString: url });
 
       const response = (await invoke("get_schema")) as string;
       const schema = JSON.parse(response);
@@ -36,29 +48,21 @@ export const ConnectionPanel = () => {
       }}
     >
       <Modal
+        size="lg"
+        w={900}
         opened={showModal}
         onClose={() => setShowModal(false)}
-        title="Database Connection"
+        title="Workspaces"
       >
-        <Input
-          placeholder="Connection string"
-          type="text"
-          value={connectionString}
-          onChange={(e) => setConnectionString(e.currentTarget.value)}
-          disabled={isConnecting}
-        />
-        <Button
-          onClick={setConnection}
-          loading={isConnecting}
-          fullWidth
-          mt="md"
-        >
-          {isConnecting ? "Connecting..." : "Connect"}
-        </Button>
+        <WorkspacePanel />
       </Modal>
-      <Button variant="light" onClick={() => setShowModal(true)}>
-        Set connection
-      </Button>
+      {activeConnection ? (
+        <Button variant="light" onClick={() => setShowModal(true)}>
+          {activeConnection.workspaceName} - {activeConnection.connection.name}
+        </Button>
+      ) : (
+        <Button onClick={() => setShowModal(true)}>Set connection</Button>
+      )}
     </div>
   );
 };

@@ -122,7 +122,6 @@ export const createSqlProvider = ({
       return { type: "table_for_join" };
     }
 
-    // Check for JOIN ... ON position - simplified version
     const onMatch = textBeforeCursorTrimmed.match(
       /\b(INNER\s+JOIN|LEFT\s+JOIN|RIGHT\s+JOIN|FULL\s+JOIN|JOIN)\s+(\w+)(?:\s+(\w+))?\s+ON\s*$/i,
     );
@@ -266,7 +265,6 @@ export const createSqlProvider = ({
       model.getOffsetAt(position),
     );
 
-    // Very specific check for JOIN ON clause - only when directly after "ON"
     const directOnMatch = textBeforeCursorTrimmed.match(/\bON\s*$/i);
     if (directOnMatch) {
       return { type: "join_on_clause" };
@@ -291,7 +289,6 @@ export const createSqlProvider = ({
       return { type: "table" };
     }
 
-    // Check if we're in the middle of a JOIN ON clause condition (only after other checks fail)
     const onConditionMatch = textBeforePosition.match(
       /\bON\s+[^;]*?(?:AND|OR)?\s*$/i,
     );
@@ -516,7 +513,6 @@ export const createSqlProvider = ({
             break;
 
           case "join_on_clause":
-            // For now, provide basic JOIN condition suggestions
             suggestions = [
               {
                 label: "= ",
@@ -541,7 +537,6 @@ export const createSqlProvider = ({
               },
             ];
 
-            // Also include all available columns
             suggestions.push(
               ...allColumns.map((column) => ({
                 label: column,

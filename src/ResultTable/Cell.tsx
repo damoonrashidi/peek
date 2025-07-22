@@ -44,11 +44,7 @@ export const DataCell = ({
   };
 
   if (typeof value === "object" && value !== null) {
-    return (
-      <Text>
-        <pre>{JSON.stringify(value, null, 2)}</pre>
-      </Text>
-    );
+    return <pre>{JSON.stringify(value, null, 2)}</pre>;
   }
 
   if (typeof value === "string" || typeof value === "number") {

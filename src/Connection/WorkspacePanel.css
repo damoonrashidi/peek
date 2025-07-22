@@ -1,0 +1,20 @@
+.workspace-picker {
+    width: 800px;
+}
+
+.workspace {
+    margin-bottom: 24px;
+}
+
+.connection {
+    cursor: pointer;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 8px;
+    &.active {
+        background: hsl(190deg, 80%, 70%);
+    }
+    &:hover {
+        background: hsl(190deg, 80%, 80%);
+    }
+}
