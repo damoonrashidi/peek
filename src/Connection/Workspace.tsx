@@ -22,6 +22,7 @@ export const Workspace = ({ name, connections }: WorkspaceProps) => {
       <Stack gap={0}>
         {connections.map((connection) => (
           <ConnectionItem
+            key={connection.url}
             connection={connection}
             isActive={connection.url === activeConnection?.connection.url}
             onActivate={() =>
