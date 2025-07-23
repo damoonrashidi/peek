@@ -1,9 +1,10 @@
 import { useAtom } from "jotai";
-import { activeConnectionAtom } from "./state";
+import { activeConnectionAtom, workspacesAtom } from "./state";
 import { Group, Stack, Text } from "@mantine/core";
 import { ConnectionItem } from "./ConnectionItem";
 import { Connection } from "./types";
 import "./WorkspacePanel.css";
+import { ConnectionForm } from "./ConnectionForm";
 
 interface WorkspaceProps {
   name: string;
@@ -11,6 +12,24 @@ interface WorkspaceProps {
 }
 export const Workspace = ({ name, connections }: WorkspaceProps) => {
   const [activeConnection, setActiveConnection] = useAtom(activeConnectionAtom);
+  const [, setWorkspaces] = useAtom(workspacesAtom);
+
+  const removeConnection = (connection: Connection) => {
+    setWorkspaces((prevWorkspaces) => {
+      const updatedWorkspaces = prevWorkspaces.map((workspace) => {
+        if (workspace.name === name) {
+          return {
+            ...workspace,
+            connections: workspace.connections.filter(
+              (conn) => conn.url !== connection.url,
+            ),
+          };
+        }
+        return workspace;
+      });
+      return updatedWorkspaces;
+    });
+  };
 
   return (
     <Stack gap="md">
@@ -28,8 +47,12 @@ export const Workspace = ({ name, connections }: WorkspaceProps) => {
             onActivate={() =>
               setActiveConnection({ workspaceName: name, connection })
             }
+            onRemove={() => {
+              removeConnection(connection);
+            }}
           />
         ))}
+        <ConnectionForm workspaceName={name} />
       </Stack>
     </Stack>
   );

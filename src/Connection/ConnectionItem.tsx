@@ -1,5 +1,5 @@
-import { Group, Text } from "@mantine/core";
-import { IconCheck } from "@tabler/icons-react";
+import { ActionIcon, Group, Menu, Text } from "@mantine/core";
+import { IconCheck, IconDotsVertical } from "@tabler/icons-react";
 import { Connection } from "./types";
 import "./WorkspacePanel";
 
@@ -7,12 +7,14 @@ interface ConnectionItemProps {
   isActive: boolean;
   connection: Connection;
   onActivate: () => void;
+  onRemove: () => void;
 }
 
 export const ConnectionItem = ({
   isActive,
   connection,
   onActivate,
+  onRemove,
 }: ConnectionItemProps) => {
   const redactedUrl = connection.url.replace(
     /(postgres:\/\/[^:]+:)[^@]+(@)/,
@@ -40,7 +42,30 @@ export const ConnectionItem = ({
         {isActive ? (
           <IconCheck color="#2B60DB" />
         ) : (
-          <div style={{ width: 20 }} />
+          <Menu>
+            <Menu.Target>
+              <ActionIcon
+                variant="transparent"
+                size="sm"
+                c="dark"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <IconDotsVertical />
+              </ActionIcon>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Item
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRemove();
+                }}
+              >
+                Remove connection
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
         )}
       </Group>
     </div>

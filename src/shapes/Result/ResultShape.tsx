@@ -7,17 +7,17 @@ import {
   ShapeUtil,
   TLBaseShape,
 } from "tldraw";
-import { DataCell } from "../ResultTable/Cell";
 import "./ResultShape.css";
 import { useAtomValue } from "jotai";
-import { schemaAtom } from "../state";
+import { schemaAtom } from "../../state";
 import {
   getInboundReferences,
   getOutboundReferences,
-} from "../ResultTable/findReferences";
+} from "./ResultTable/findReferences";
 import { Parser } from "node-sql-parser";
-import { useVirtualizedTable } from "../tools/useVirtualizedTable";
+import { useVirtualizedTable } from "../../tools/useVirtualizedTable";
 import { useMemo, useRef } from "react";
+import { DataCell } from "./ResultTable/Cell";
 
 type ResultShape = TLBaseShape<
   "result",

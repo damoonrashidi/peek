@@ -8,11 +8,11 @@ import {
   stopEventPropagation,
 } from "tldraw";
 import "./Query.css";
-import { SqlEditor } from "../Editor/SqlEditor";
+import { SqlEditor } from "./Editor/SqlEditor";
 import { editor } from "monaco-editor";
 import { Monaco } from "@monaco-editor/react";
 import { format } from "sql-formatter";
-import { useExecuteQuery } from "../tools/useExecuteQuery";
+import { useExecuteQuery } from "../../tools/useExecuteQuery";
 
 export type QueryShape = TLBaseShape<
   "query",

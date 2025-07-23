@@ -1,7 +1,7 @@
-import { BarChartShapeUtil } from "./BarChartShape";
-import { QueryErrorShapeUtil } from "./ErrorShape";
-import { QueryShapeUtil } from "./QueryShape";
-import { ResultShapeUtil } from "./ResultShape";
+import { BarChartShapeUtil } from "./Chart/BarChartShape";
+import { QueryErrorShapeUtil } from "./Error/ErrorShape";
+import { QueryShapeUtil } from "./Query/QueryShape";
+import { ResultShapeUtil } from "./Result/ResultShape";
 
 export const customShapes = [
   QueryShapeUtil,

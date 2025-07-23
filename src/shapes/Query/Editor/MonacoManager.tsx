@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import Editor, { Monaco } from "@monaco-editor/react";
 import { useAtomValue } from "jotai";
-import { schemaAtom, sqlLanguageAtom, sqlParserAtom } from "../state";
+import { schemaAtom, sqlLanguageAtom, sqlParserAtom } from "../../../state";
 import { createSqlProvider } from "./languageProvider";
 import { editor, IDisposable } from "monaco-editor";
 

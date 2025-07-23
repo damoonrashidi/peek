@@ -1,8 +1,8 @@
 import { Text } from "@mantine/core";
 import { CellReference } from "./findReferences";
 import { useEditor } from "tldraw";
-import { useExecuteQuery } from "../tools/useExecuteQuery";
 import "./Cell.css";
+import { useExecuteQuery } from "../../../tools/useExecuteQuery";
 
 export const DataCell = ({
   value,

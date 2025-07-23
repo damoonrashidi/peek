@@ -15,7 +15,7 @@ import { sqlLanguageAtom, sqlParserAtom } from "./state";
 import { useAtom, useAtomValue } from "jotai";
 import { createTheme, MantineProvider } from "@mantine/core";
 import { Parser, Language } from "web-tree-sitter";
-import { MonacoManager } from "./Editor/MonacoManager";
+import { MonacoManager } from "./shapes/Query/Editor/MonacoManager";
 import {
   activeConnectionAtom,
   snapshotForUrlAtom,

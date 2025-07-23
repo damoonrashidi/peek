@@ -9,7 +9,7 @@ export const WorkspacePanel = () => {
   const workspaces = useAtomValue(workspacesAtom);
 
   return (
-    <Stack gap="lg">
+    <Stack gap="lg" mah={800}>
       {workspaces.map((workspace, i) => (
         <Fragment key={workspace.name}>
           <Workspace
