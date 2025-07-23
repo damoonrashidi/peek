@@ -9,10 +9,13 @@
     color: var(--rp-text);
 }
 
-.header {
-    background: hsl(0deg, 0%, 95%);
-    @media (prefers-color-scheme: dark) {
-        background: hsl(0deg, 0%, 15%);
+th.header {
+    background: var(--header-base);
+    &.inbound {
+        background: var(--inbound-key);
+    }
+    &.outbound {
+        background: var(--outbound-key);
     }
 }
 
