@@ -1,6 +1,5 @@
 import {
   DefaultContextMenu,
-  DefaultContextMenuContent,
   TldrawUiMenuGroup,
   TldrawUiMenuItem,
   TldrawUiMenuSubmenu,

@@ -89,9 +89,7 @@ function App() {
             }));
 
             debounceRef.current = undefined;
-
-            console.log("saving");
-          }, 5000);
+          }, 1000);
         }
       },
       { source: "user", scope: "document" },
