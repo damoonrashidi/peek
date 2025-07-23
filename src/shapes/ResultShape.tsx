@@ -56,6 +56,17 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
     const astOptions = new Parser().astify(shape.props.query);
     const ast = Array.isArray(astOptions) ? astOptions[0] : astOptions;
 
+    const { outbound, inbound } = useMemo(() => {
+      const outbound: Record<string, { table: string; column: string }[]> = {};
+      const inbound: Record<string, { table: string; column: string }[]> = {};
+      headers.forEach((column) => {
+        outbound[column] = getInboundReferences(ast, schema.references, column);
+        inbound[column] = getOutboundReferences(ast, schema.references, column);
+      });
+
+      return { outbound, inbound };
+    }, [headers, ast, schema.references]);
+
     if (shape.props.data.length === 0) {
       return (
         <HTMLContainer>
@@ -73,17 +84,6 @@ export class ResultShapeUtil extends ShapeUtil<ResultShape> {
         </HTMLContainer>
       );
     }
-
-    const { outbound, inbound } = useMemo(() => {
-      const outbound: Record<string, { table: string; column: string }[]> = {};
-      const inbound: Record<string, { table: string; column: string }[]> = {};
-      headers.forEach((column) => {
-        outbound[column] = getInboundReferences(ast, schema.references, column);
-        inbound[column] = getOutboundReferences(ast, schema.references, column);
-      });
-
-      return { outbound, inbound };
-    }, [headers, ast, schema.references]);
 
     return (
       <HTMLContainer id={shape.id}>

@@ -9,9 +9,6 @@ import {
   Tldraw,
   TLStore,
 } from "tldraw";
-import "tldraw/tldraw.css";
-import "@mantine/core/styles.css";
-import "./App.css";
 import { customComponents, customUiOverrides } from "./TldrawUi";
 import { QueryTool } from "./tools/QueryTool";
 import { sqlLanguageAtom, sqlParserAtom } from "./state";
@@ -25,6 +22,10 @@ import {
   snapshotsAtom,
 } from "./Connection/state";
 import { customShapes } from "./shapes";
+import "tldraw/tldraw.css";
+import "@mantine/core/styles.css";
+import "@mantine/charts/styles.css";
+import "./App.css";
 
 const theme = createTheme({});
 
@@ -39,6 +40,7 @@ function App() {
 
   const [store, setStore] = useState<TLStore>();
   const [, setSnapshots] = useAtom(snapshotsAtom);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   const initTreeSitter = async () => {
     await Parser.init();
@@ -79,17 +81,24 @@ function App() {
         if (!activeConnection) {
           return;
         }
+        if (!debounceRef.current) {
+          debounceRef.current = setTimeout(() => {
+            setSnapshots((previous) => ({
+              ...previous,
+              [activeConnection.connection.url]: getSnapshot(store),
+            }));
 
-        setSnapshots((previous) => ({
-          ...previous,
-          [activeConnection.connection.url]: getSnapshot(store),
-        }));
+            debounceRef.current = undefined;
+
+            console.log("saving");
+          }, 5000);
+        }
       },
       { source: "user", scope: "document" },
     );
 
     return unsubscribe;
-  }, [store, activeConnection?.connection.url]);
+  }, [activeConnection?.connection.url]);
 
   return (
     <MantineProvider theme={theme}>

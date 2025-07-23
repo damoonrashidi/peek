@@ -52,7 +52,7 @@ export const useCreateChart = (shape: TLShape) => {
         y: shape.y - 540,
         props: {
           data: fields,
-          w: props.w,
+          w: Math.max(props.w, 500),
           h: 500,
         },
       });

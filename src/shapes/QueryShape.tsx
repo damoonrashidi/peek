@@ -63,6 +63,7 @@ export class QueryShapeUtil extends ShapeUtil<QueryShape> {
       const formatted = format(editorInstance.getValue(), {
         keywordCase: "upper",
         functionCase: "upper",
+        language: "postgresql",
       });
 
       editorInstance?.setValue(formatted);
