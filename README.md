@@ -1,10 +1,23 @@
-# About
+<div align="center">
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/4fc87548-4fa8-446d-ad23-23dcc20dcf53">
+  <source media="(prefers-color-scheme: light)" srcset="https://github.com/user-attachments/assets/4fc87548-4fa8-446d-ad23-23dcc20dcf53">
+  <img alt="Helix" height="128" src="https://github.com/user-attachments/assets/4fc87548-4fa8-446d-ad23-23dcc20dcf53">
+</picture>
 
-https://github.com/user-attachments/assets/fe88693b-4741-42bc-9286-67db0c44a084
+</div>
+
+# Peek
 
 
 Peek is an Infinite Canvas based database client. Users can add query nodes, which when executed will spawn Result nodes. Foreign keys and references are clickable, which when clicked on spawn new result nodes.
+
+
+
+## Demo
+
+https://github.com/user-attachments/assets/fe88693b-4741-42bc-9286-67db0c44a084
 
 ## Installation
 
