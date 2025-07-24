@@ -68,35 +68,25 @@ function App() {
   }, []);
 
   useEffect(() => {
-    setTimeout(() => {
-      if (snapshot && store) {
-        loadSnapshot(store, snapshot);
-      }
-    }, 50);
-  }, [activeConnection?.connection.url]);
+    if (!store || !snapshot) return;
+    loadSnapshot(store, snapshot);
+  }, [store, snapshot]);
 
   useEffect(() => {
-    const unsubscribe = store?.listen(
-      () => {
-        if (!activeConnection) {
-          return;
-        }
-        if (!debounceRef.current) {
-          debounceRef.current = setTimeout(() => {
-            setSnapshots((previous) => ({
-              ...previous,
-              [activeConnection.connection.url]: getSnapshot(store),
-            }));
+    if (!activeConnection || !store) return;
 
-            debounceRef.current = undefined;
-          }, 1000);
-        }
-      },
-      { source: "user", scope: "document" },
-    );
+    const handler = () => {
+      console.log("saving...");
+      setSnapshots((previous) => ({
+        ...previous,
+        [activeConnection.connection.url]: getSnapshot(store),
+      }));
+    };
 
-    return unsubscribe;
-  }, [activeConnection?.connection.url]);
+    debounceRef.current = setInterval(handler, 5000);
+
+    return () => clearInterval(debounceRef.current!);
+  }, [activeConnection?.connection.url, store]);
 
   return (
     <MantineProvider theme={theme}>
