@@ -12,7 +12,7 @@ export const useExecuteQuery = () => {
         const response = (await invoke("get_results", { query })) as string;
         const result = JSON.parse(response) as [string, unknown][][];
 
-        const x = editor.getSelectionPageBounds()?.right ?? shape.x + 500;
+        const x = (editor.getSelectionPageBounds()?.right ?? shape.x) + 50;
 
         if (queries.length > 1 && result.length === 0) {
           continue;

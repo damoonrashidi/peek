@@ -14,7 +14,6 @@ export const DataCell = ({
   outbound: CellReference[];
 }) => {
   const editor = useEditor();
-  const shape = editor.getOnlySelectedShape()!;
   const executeQuery = useExecuteQuery();
 
   const openOutboundReferences = async () => {
@@ -22,6 +21,7 @@ export const DataCell = ({
       (ref) =>
         `SELECT * FROM ${ref.table} WHERE ${ref.column} = '${value}' LIMIT 300`,
     );
+    const shape = editor.getOnlySelectedShape()!;
 
     if (!shape) {
       return;
@@ -35,6 +35,7 @@ export const DataCell = ({
       (ref) =>
         `SELECT * FROM ${ref.table} WHERE ${ref.column} = '${value}' LIMIT 300`,
     );
+    const shape = editor.getOnlySelectedShape()!;
 
     if (!shape) {
       return;

@@ -21,7 +21,8 @@ export const ResultTable = ({ shape }: { shape: ResultShape }) => {
   const rowVirtualizer = useVirtualizer({
     count: totalRows,
     getScrollElement: () => scrollContainerRef.current,
-    estimateSize: () => 80,
+    overscan: 10,
+    estimateSize: () => 40,
   });
 
   const ast = useMemo(() => {
@@ -137,7 +138,6 @@ export const ResultTable = ({ shape }: { shape: ResultShape }) => {
                 })}
               </Table.Tr>
             ))}
-            )
           </Table.Tbody>
         </Table>
       </div>
