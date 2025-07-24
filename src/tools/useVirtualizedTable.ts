@@ -1,4 +1,10 @@
-import { useState, useEffect, useCallback, RefObject } from "react";
+import {
+  useState,
+  useLayoutEffect,
+  useCallback,
+  RefObject,
+  useRef,
+} from "react";
 
 const ESTIMATED_ROW_HEIGHT = 40;
 const VISIBLE_ROWS_BUFFER = 5;
@@ -14,44 +20,43 @@ export const useVirtualizedTable = ({
   scrollContainerRef,
   data,
 }: UseVirtualizedTableProps) => {
-  const [visibleStartIndex, setVisibleStartIndex] = useState(0);
-  const [visibleEndIndex, setVisibleEndIndex] = useState(0);
+  const [visibleRange, setVisibleRange] = useState(() => ({
+    start: 0,
+    end: 0,
+  }));
+
   const [rowHeight, setRowHeight] = useState(ESTIMATED_ROW_HEIGHT);
+  const rowHeightRef = useRef(ESTIMATED_ROW_HEIGHT);
 
-  const handleScroll = useCallback(() => {
-    if (scrollContainerRef.current) {
-      const { scrollTop, clientHeight } = scrollContainerRef.current;
+  const updateVisibleRange = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
 
-      const newStartIndex = Math.max(
-        0,
-        Math.floor(scrollTop / rowHeight) - VISIBLE_ROWS_BUFFER,
-      );
-      const numVisibleRows =
-        Math.ceil(clientHeight / rowHeight) + 2 * VISIBLE_ROWS_BUFFER;
-      const newEndIndex = Math.min(totalRows, newStartIndex + numVisibleRows);
+    const { scrollTop, clientHeight } = container;
 
-      if (
-        newStartIndex !== visibleStartIndex ||
-        newEndIndex !== visibleEndIndex
-      ) {
-        setVisibleStartIndex(newStartIndex);
-        setVisibleEndIndex(newEndIndex);
-      }
-    }
-  }, [
-    rowHeight,
-    totalRows,
-    visibleStartIndex,
-    visibleEndIndex,
-    scrollContainerRef,
-  ]);
+    const currentRowHeight = rowHeightRef.current;
+    const newStart = Math.max(
+      0,
+      Math.floor(scrollTop / currentRowHeight) - VISIBLE_ROWS_BUFFER,
+    );
+    const numVisibleRows =
+      Math.ceil(clientHeight / currentRowHeight) + 2 * VISIBLE_ROWS_BUFFER;
+    const newEnd = Math.min(totalRows, newStart + numVisibleRows);
 
-  useEffect(() => {
-    if (scrollContainerRef.current && totalRows > 0 && data.length > 0) {
+    setVisibleRange((prev) => {
+      if (prev.start === newStart && prev.end === newEnd) return prev;
+      return { start: newStart, end: newEnd };
+    });
+  }, [scrollContainerRef, totalRows]);
+
+  // Use layout effect to ensure DOM is measured before paint
+  useLayoutEffect(() => {
+    if (scrollContainerRef.current && data.length > 0) {
       const tempRow = document.createElement("tr");
       tempRow.innerHTML = data[0]
         .map(([, value]) => `<td>${value}</td>`)
         .join("");
+
       const tempTable = document.createElement("table");
       const tempTbody = document.createElement("tbody");
       tempTbody.appendChild(tempRow);
@@ -60,23 +65,28 @@ export const useVirtualizedTable = ({
       tempTable.style.visibility = "hidden";
       document.body.appendChild(tempTable);
 
-      const measuredHeight = tempRow.offsetHeight;
-      if (measuredHeight > 0 && measuredHeight !== rowHeight) {
-        setRowHeight(measuredHeight);
-      }
+      const measured = tempRow.offsetHeight;
       document.body.removeChild(tempTable);
-    }
-  }, [data, rowHeight, totalRows, scrollContainerRef]);
 
-  useEffect(() => {
-    if (scrollContainerRef.current) {
-      handleScroll();
-      scrollContainerRef.current.addEventListener("scroll", handleScroll);
-      return () => {
-        scrollContainerRef.current?.removeEventListener("scroll", handleScroll);
-      };
+      if (measured > 0 && measured !== rowHeightRef.current) {
+        rowHeightRef.current = measured;
+        setRowHeight(measured);
+      }
     }
-  }, [handleScroll, scrollContainerRef]);
+  }, [data]);
 
-  return { visibleStartIndex, visibleEndIndex, rowHeight };
+  useLayoutEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    updateVisibleRange();
+    container.addEventListener("scroll", updateVisibleRange);
+    return () => container.removeEventListener("scroll", updateVisibleRange);
+  }, [scrollContainerRef, updateVisibleRange]);
+
+  return {
+    visibleStartIndex: visibleRange.start,
+    visibleEndIndex: visibleRange.end,
+    rowHeight,
+  };
 };

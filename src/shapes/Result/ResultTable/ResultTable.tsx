@@ -1,9 +1,9 @@
-import { Paper, Stack, Table, Text } from "@mantine/core";
+import { Paper, Table, Text } from "@mantine/core";
 import { useAtomValue } from "jotai";
 import { useRef, useMemo } from "react";
 import { HTMLContainer, useEditor } from "tldraw";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import { schemaAtom } from "../../../state";
-import { useVirtualizedTable } from "../../../tools/useVirtualizedTable";
 import { ResultShape } from "../ResultShape";
 import { DataCell } from "./Cell";
 import { getInboundReferences, getOutboundReferences } from "./findReferences";
@@ -18,21 +18,11 @@ export const ResultTable = ({ shape }: { shape: ResultShape }) => {
   const headers = (shape.props.data[0] ?? []).map(([key]) => key);
   const totalRows = shape.props.data.length;
 
-  const { visibleStartIndex, visibleEndIndex, rowHeight } = useVirtualizedTable(
-    {
-      totalRows,
-      scrollContainerRef,
-      data: shape.props.data,
-    },
-  );
-
-  const visibleRows = shape.props.data.slice(
-    visibleStartIndex,
-    visibleEndIndex,
-  );
-  const totalContentHeight = totalRows * rowHeight;
-  const paddingTop = visibleStartIndex * rowHeight;
-  const paddingBottom = (totalRows - visibleEndIndex) * rowHeight;
+  const rowVirtualizer = useVirtualizer({
+    count: totalRows,
+    getScrollElement: () => scrollContainerRef.current,
+    estimateSize: () => 80,
+  });
 
   const ast = useMemo(() => {
     const astOptions = new Parser().astify(shape.props.query);
@@ -74,91 +64,82 @@ export const ResultTable = ({ shape }: { shape: ResultShape }) => {
         style={{
           width: shape.props.w,
           height: shape.props.h,
-          pointerEvents: isEditing ? "all" : undefined,
+          pointerEvents: isEditing ? "all" : "auto",
           overflow: "auto",
           position: "relative",
         }}
         ref={scrollContainerRef}
       >
-        <Stack
-          gap="md"
-          style={{ height: totalContentHeight, position: "relative" }}
+        <Table
+          stickyHeader
+          striped
+          withColumnBorders
+          borderColor="var(--border-base)"
+          style={{
+            position: "absolute",
+            width: "100%",
+          }}
         >
-          <Table
-            stickyHeader
-            striped
-            withColumnBorders
-            borderColor="var(--border-base)"
-            style={{
-              position: "absolute",
-              top: paddingTop,
-              width: "100%",
-            }}
-          >
-            <Table.Thead>
-              <Table.Tr className="header-row">
-                {headers.map((header, i) => {
-                  const hasInbound = inbound[header]?.length > 0;
-                  const hasOutbound = outbound[header]?.length > 0;
-                  const headerClasses = ["header"];
+          <Table.Thead>
+            <Table.Tr className="header-row">
+              {headers.map((header, i) => {
+                const hasInbound = inbound[header]?.length > 0;
+                const hasOutbound = outbound[header]?.length > 0;
+                const headerClasses = ["header"];
+
+                if (hasInbound) {
+                  headerClasses.push("inbound");
+                } else if (hasOutbound) {
+                  headerClasses.push("outbound");
+                }
+
+                return (
+                  <Table.Th key={i} className={headerClasses.join(" ")}>
+                    <Text fw="bold" c="gray">
+                      {header}
+                      {hasInbound && hasOutbound && " ↕"}
+                      {hasInbound && !hasOutbound && " ↑"}
+                      {hasOutbound && !hasInbound && " ↓"}
+                    </Text>
+                  </Table.Th>
+                );
+              })}
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {rowVirtualizer.getVirtualItems().map((row, i) => (
+              <Table.Tr key={row.key}>
+                {shape.props.data[row.index].map(([column, value], o) => {
+                  const hasInbound = inbound[column]?.length > 0;
+                  const hasOutbound = outbound[column]?.length > 0;
+
+                  const cellClasses = ["cell"];
 
                   if (hasInbound) {
-                    headerClasses.push("inbound");
+                    cellClasses.push("inbound");
                   } else if (hasOutbound) {
-                    headerClasses.push("outbound");
+                    cellClasses.push("outbound");
+                  }
+
+                  if (i % 2 === 0) {
+                    cellClasses.push("even");
                   }
 
                   return (
-                    <Table.Th key={i} className={headerClasses.join(" ")}>
-                      <Text fw="bold" c="gray">
-                        {header}
-                        {hasInbound && hasOutbound && " ↕"}
-                        {hasInbound && !hasOutbound && " ↑"}
-                        {hasOutbound && !hasInbound && " ↓"}
-                      </Text>
-                    </Table.Th>
+                    <Table.Td key={o} className={cellClasses.join(" ")}>
+                      <DataCell
+                        value={value}
+                        outbound={outbound[column]}
+                        inbound={inbound[column]}
+                      />
+                    </Table.Td>
                   );
                 })}
               </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {visibleRows.map((row, i) => {
-                const originalIndex = visibleStartIndex + i;
-                return (
-                  <Table.Tr key={originalIndex}>
-                    {row.map(([column, value], o) => {
-                      const hasInbound = inbound[column]?.length > 0;
-                      const hasOutbound = outbound[column]?.length > 0;
-
-                      const cellClasses = ["cell"];
-
-                      if (hasInbound) {
-                        cellClasses.push("inbound");
-                      } else if (hasOutbound) {
-                        cellClasses.push("outbound");
-                      }
-
-                      if (i % 2 === 0) {
-                        cellClasses.push("even");
-                      }
-
-                      return (
-                        <Table.Td key={o} className={cellClasses.join(" ")}>
-                          <DataCell
-                            value={value}
-                            outbound={outbound[column]}
-                            inbound={inbound[column]}
-                          />
-                        </Table.Td>
-                      );
-                    })}
-                  </Table.Tr>
-                );
-              })}
-            </Table.Tbody>
-          </Table>
-          <div style={{ height: paddingBottom }}></div>
-        </Stack>
+            ))}
+            )
+          </Table.Tbody>
+        </Table>
       </div>
     </HTMLContainer>
   );
