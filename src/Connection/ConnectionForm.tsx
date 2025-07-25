@@ -1,9 +1,9 @@
 import { useForm } from "@mantine/form";
-import "./ConnectionForm.css";
 import { ActionIcon } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { useAtom } from "jotai";
 import { workspacesAtom } from "./state";
+import "./ConnectionForm.css";
 
 interface ConnectionFormProps {
   workspaceName: string;
@@ -29,6 +29,10 @@ export const ConnectionForm = ({ workspaceName }: ConnectionFormProps) => {
   });
 
   const createConnection = (values: ConnectionFormFields) => {
+    if (values.name.length === 0 || values.url.length === 0) {
+      return;
+    }
+
     setWorkspaces((workspaces) =>
       workspaces.map((workspace) => {
         if (workspace.name === workspaceName) {
@@ -75,9 +79,11 @@ export const ConnectionForm = ({ workspaceName }: ConnectionFormProps) => {
         className="input"
         {...form.getInputProps("url")}
       />
-      <ActionIcon type="submit" radius="xl" variant="subtle" color="dark">
-        <IconPlus />
-      </ActionIcon>
+      {form.values.name.length > 0 && form.values.url.length > 0 && (
+        <ActionIcon variant="transparent" c="dark" type="submit">
+          <IconPlus />
+        </ActionIcon>
+      )}
     </form>
   );
 };

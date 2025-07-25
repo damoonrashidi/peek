@@ -5,8 +5,8 @@ import {
   track,
   useEditor,
 } from "tldraw";
-import { QueryShapeUtil } from "../shapes/QueryShape";
 import { useExecuteQuery } from "./useExecuteQuery";
+import { QueryShapeUtil } from "../shapes/Query/QueryShape";
 
 export const QueryContextualToolbarComponent = track(() => {
   const editor = useEditor();

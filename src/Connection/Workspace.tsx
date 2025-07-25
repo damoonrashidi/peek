@@ -1,10 +1,11 @@
 import { useAtom } from "jotai";
 import { activeConnectionAtom, workspacesAtom } from "./state";
-import { Group, Stack, Text } from "@mantine/core";
+import { ActionIcon, Group, Stack, Text } from "@mantine/core";
 import { ConnectionItem } from "./ConnectionItem";
 import { Connection } from "./types";
 import "./WorkspacePanel.css";
 import { ConnectionForm } from "./ConnectionForm";
+import { IconMinus } from "@tabler/icons-react";
 
 interface WorkspaceProps {
   name: string;
@@ -13,6 +14,12 @@ interface WorkspaceProps {
 export const Workspace = ({ name, connections }: WorkspaceProps) => {
   const [activeConnection, setActiveConnection] = useAtom(activeConnectionAtom);
   const [, setWorkspaces] = useAtom(workspacesAtom);
+
+  const removeWorkspace = () => {
+    setWorkspaces((prevWorkspaces) => {
+      return prevWorkspaces.filter((workspace) => workspace.name !== name);
+    });
+  };
 
   const removeConnection = (connection: Connection) => {
     setWorkspaces((prevWorkspaces) => {
@@ -34,9 +41,12 @@ export const Workspace = ({ name, connections }: WorkspaceProps) => {
   return (
     <Stack gap="md">
       <Group align="center" justify="space-between">
-        <Text size="md" fw="bold">
+        <Text size="md" fw="bold" h={4}>
           {name}
         </Text>
+        <ActionIcon variant="transparent" onClick={removeWorkspace} c="dark">
+          <IconMinus />
+        </ActionIcon>
       </Group>
       <Stack gap={0}>
         {connections.map((connection) => (

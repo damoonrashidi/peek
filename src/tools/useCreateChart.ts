@@ -1,6 +1,6 @@
 import { createShapeId, TLShape, useEditor } from "tldraw";
-import { ResultShapeUtil } from "../shapes/ResultShape";
 import { createArrowBetweenShapes } from "./createArrowBetweenShapes";
+import { ResultShapeUtil } from "../shapes/Result/ResultShape";
 
 export const useCreateChart = (shape: TLShape) => {
   const editor = useEditor();

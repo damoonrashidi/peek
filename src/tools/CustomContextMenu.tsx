@@ -6,7 +6,7 @@ import {
   TLUiContextMenuProps,
   useEditor,
 } from "tldraw";
-import { ResultShapeUtil } from "../shapes/ResultShape";
+import { ResultShapeUtil } from "../shapes/Result/ResultShape";
 
 export const CustomContextMenu = (props: TLUiContextMenuProps) => {
   const editor = useEditor();

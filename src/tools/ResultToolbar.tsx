@@ -4,10 +4,10 @@ import {
   TldrawUiContextualToolbar,
   useEditor,
 } from "tldraw";
-import { ResultShapeUtil } from "../shapes/ResultShape";
 import { Divider, Group, Text } from "@mantine/core";
 import { Parser } from "node-sql-parser";
 import { useCreateChart } from "./useCreateChart";
+import { ResultShapeUtil } from "../shapes/Result/ResultShape";
 
 export const ResultContextualToolbarComponent = () => {
   const editor = useEditor();
