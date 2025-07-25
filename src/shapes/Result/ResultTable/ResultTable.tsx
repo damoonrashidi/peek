@@ -7,7 +7,7 @@ import { schemaAtom } from "../../../state";
 import { ResultShape } from "../ResultShape";
 import { DataCell } from "./Cell";
 import { getInboundReferences, getOutboundReferences } from "./findReferences";
-import { Parser } from "node-sql-parser";
+import { AST, Parser } from "node-sql-parser";
 
 export const ResultTable = ({ shape }: { shape: ResultShape }) => {
   const editor = useEditor();
@@ -26,8 +26,12 @@ export const ResultTable = ({ shape }: { shape: ResultShape }) => {
   });
 
   const ast = useMemo(() => {
-    const astOptions = new Parser().astify(shape.props.query);
-    return Array.isArray(astOptions) ? astOptions[0] : astOptions;
+    try {
+      const astOptions = new Parser().astify(shape.props.query);
+      return Array.isArray(astOptions) ? astOptions[0] : astOptions;
+    } catch {
+      return {} as AST;
+    }
   }, [shape.props.query]);
 
   const { outbound, inbound } = useMemo(() => {
