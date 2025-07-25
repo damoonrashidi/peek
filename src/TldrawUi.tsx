@@ -113,7 +113,6 @@ export const customComponents: TLComponents = {
     const tools = useTools();
 
     delete tools["rectangle"];
-    delete tools["text"];
     delete tools["arrow"];
     delete tools["line"];
 
@@ -121,7 +120,9 @@ export const customComponents: TLComponents = {
       <DefaultToolbar {...props}>
         <TldrawUiMenuItem {...tools["select"]} />
         <TldrawUiMenuItem {...tools["query"]} />
+        <TldrawUiMenuItem {...tools["draw"]} />
         <TldrawUiMenuItem {...tools["hand"]} />
+        <TldrawUiMenuItem {...tools["text"]} />
       </DefaultToolbar>
     );
   },
