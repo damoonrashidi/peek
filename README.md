@@ -10,10 +10,7 @@
 
 # Peek
 
-
 Peek is an Infinite Canvas based database client. Users can add query nodes, which when executed will spawn Result nodes. Foreign keys and references are clickable, which when clicked on spawn new result nodes.
-
-
 
 ## Demo
 
@@ -34,7 +31,7 @@ Note, the UI requires you to have a workspace set up, but there is no UI to actu
 
 - [x] Save/Load canvas (queries + connection) -> Workspaces
 - [x] Save/Load connections -> Workspaces
-- [ ] UI to manage workspaces
+- [x] UI to manage workspaces
 
 ## Introspection
 
@@ -47,7 +44,7 @@ Note, the UI requires you to have a workspace set up, but there is no UI to actu
 - [ ] Pagination on query results if limit/offset in query
 - [ ] Context menu on result shape to select result tree
 - [x] Charts
-- [x] Virtualization for tables for large result shape performance
+- [~] Virtualization for tables for large result shape performance
 
 ## Tools
 

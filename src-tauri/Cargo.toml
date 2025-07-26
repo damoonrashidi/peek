@@ -33,3 +33,5 @@ sqlx = { version = "0.8.6", features = [
 uuid = "1.17.0"
 chrono = { version = "0.4.41", features = ["serde"] }
 rust_decimal = { version = "1.37.2", features = ["serde"] }
+tauri-plugin-fs = "2"
+tauri-plugin-dialog = "2"
