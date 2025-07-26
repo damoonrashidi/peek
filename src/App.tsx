@@ -34,13 +34,13 @@ function App() {
   const [, setSqlParser] = useAtom(sqlParserAtom);
   const [, sqlSqlLanguage] = useAtom(sqlLanguageAtom);
   const activeConnection = useAtomValue(activeConnectionAtom);
-  const snapshot = useAtomValue(
+  const initialSnapshot = useAtomValue(
     snapshotForUrlAtom(activeConnection?.connection.url ?? "default"),
   );
-
   const [store, setStore] = useState<TLStore>();
   const [, setSnapshots] = useAtom(snapshotsAtom);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isInitialLoadRef = useRef(true); // To track initial snapshot load
 
   const initTreeSitter = async () => {
     await Parser.init();
@@ -65,17 +65,27 @@ function App() {
       bindingUtils: [...defaultBindingUtils],
     });
     setStore(tlStore);
+
+    return () => {
+      tlStore.dispose();
+    };
   }, []);
 
   useEffect(() => {
-    if (!store || !snapshot) return;
-    loadSnapshot(store, snapshot);
-  }, [store, snapshot]);
+    if (!store) {
+      return;
+    }
+
+    loadSnapshot(store, initialSnapshot);
+    isInitialLoadRef.current = false;
+  }, [store, initialSnapshot, activeConnection?.connection.url]);
 
   useEffect(() => {
-    if (!activeConnection || !store) return;
+    if (!activeConnection || !store) {
+      return;
+    }
 
-    const handler = () => {
+    const saveSnapshot = () => {
       console.log("saving...");
       setSnapshots((previous) => ({
         ...previous,
@@ -83,10 +93,26 @@ function App() {
       }));
     };
 
-    debounceRef.current = setInterval(handler, 5000);
+    const cleanup = store.listen(
+      () => {
+        if (debounceTimeoutRef.current) {
+          clearTimeout(debounceTimeoutRef.current);
+        }
+        debounceTimeoutRef.current = setTimeout(() => {
+          saveSnapshot();
+          debounceTimeoutRef.current = null;
+        }, 3000);
+      },
+      { scope: "document", source: "user" },
+    );
 
-    return () => clearInterval(debounceRef.current!);
-  }, [activeConnection?.connection.url, store]);
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+      cleanup();
+    };
+  }, [activeConnection?.connection.url, store, setSnapshots]);
 
   return (
     <MantineProvider theme={theme}>
